@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Lunadroid.App.Pages.WelcomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#1A1A2E}">
+
+    <VerticalStackLayout
+        Spacing="24"
+        VerticalOptions="Center"
+        HorizontalOptions="Center"
+        Padding="40">
+
+        <!-- App Icon Circle -->
+        <Frame
+            WidthRequest="120"
+            HeightRequest="120"
+            CornerRadius="60"
+            HasShadow="True"
+            BackgroundColor="#6C63FF"
+            HorizontalOptions="Center"
+            Padding="0">
+            <Label
+                Text="L"
+                FontSize="64"
+                FontAttributes="Bold"
+                TextColor="White"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Frame>
+
+        <!-- Title -->
+        <Label
+            Text="Lunadroid"
+            FontSize="36"
+            FontAttributes="Bold"
+            TextColor="{AppThemeBinding Light=#1A1A2E, Dark=#FFFFFF}"
+            HorizontalOptions="Center" />
+
+        <!-- Tagline -->
+        <Label
+            Text="影视聚合播放与下载"
+            FontSize="20"
+            TextColor="{AppThemeBinding Light=#555555, Dark=#AAAAAA}"
+            HorizontalOptions="Center" />
+
+        <!-- Description -->
+        <Label
+            Text="一站式影视资源聚合平台，支持多源搜索、在线播放与离线下载。海量影片尽在掌握，为您打造极致观影体验。"
+            FontSize="14"
+            TextColor="{AppThemeBinding Light=#777777, Dark=#999999}"
+            HorizontalOptions="Center"
+            HorizontalTextAlignment="Center"
+            LineHeight="1.5"
+            MaxWidth="320" />
+
+        <!-- Start Button -->
+        <Button
+            Text="开始"
+            FontSize="18"
+            FontAttributes="Bold"
+            TextColor="White"
+            BackgroundColor="#6C63FF"
+            CornerRadius="28"
+            HeightRequest="56"
+            WidthRequest="240"
+            Margin="0,20,0,0"
+            Clicked="OnStartClicked" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Lunadroid.App.Pages.TermsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    Title="服务条款"
+    BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#1A1A2E}">
+
+    <Grid RowDefinitions="*,Auto" Padding="24">
+
+        <!-- Terms Content -->
+        <ScrollView Grid.Row="0" Margin="0,0,0,16">
+            <VerticalStackLayout Spacing="12">
+                <Label
+                    Text="Lunadroid 服务条款"
+                    FontSize="22"
+                    FontAttributes="Bold"
+                    TextColor="{AppThemeBinding Light=#1A1A2E, Dark=#FFFFFF}" />
+
+                <Label
+                    Text="最后更新日期：2026年1月1日"
+                    FontSize="12"
+                    TextColor="{AppThemeBinding Light=#999999, Dark=#777777}" />
+
+                <BoxView
+                    HeightRequest="1"
+                    Color="{AppThemeBinding Light=#E0E0E0, Dark=#333333}"
+                    Margin="0,8" />
+
+                <Label
+                    FontSize="14"
+                    TextColor="{AppThemeBinding Light=#444444, Dark=#CCCCCC}"
+                    LineHeight="1.6">
+                    <Label.Text>
+<![CDATA[1. 服务说明
+Lunadroid 是一款影视资源聚合工具，本应用本身不提供任何影视资源存储，所有内容均来自第三方公开接口。
+
+2. 用户责任
+用户应遵守当地法律法规，不得将本应用用于任何违法用途。用户自行对搜索和观看的内容负责。
+
+3. 知识产权
+本应用尊重知识产权，若第三方源涉及侵权问题，请与我们联系，我们将及时移除相关源。
+
+4. 免责声明
+本应用不对第三方源的可用性、准确性和合法性负责。使用本应用即表示您理解并接受此风险。
+
+5. 隐私保护
+本应用不会收集、上传或分享您的个人信息。所有数据仅存储在您的本地设备上。
+
+6. 协议修改
+我们保留随时修改本协议的权利，修改后的协议将在应用内公布。继续使用本应用即视为接受修改后的协议。]]>
+                    </Label.Text>
+                </Label>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Agreement and Button -->
+        <VerticalStackLayout Grid.Row="1" Spacing="16">
+            <HorizontalStackLayout Spacing="8">
+                <material:CheckBox
+                    x:Name="AgreeCheckBox"
+                    IsChecked="False"
+                    Color="#6C63FF" />
+                <Label
+                    Text="我已阅读并同意以上服务条款"
+                    FontSize="14"
+                    TextColor="{AppThemeBinding Light=#444444, Dark=#CCCCCC}"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Button
+                x:Name="NextButton"
+                Text="下一步"
+                FontSize="16"
+                FontAttributes="Bold"
+                TextColor="White"
+                BackgroundColor="#6C63FF"
+                CornerRadius="28"
+                HeightRequest="52"
+                IsEnabled="{Binding Source={x:Reference AgreeCheckBox}, Path=IsChecked}"
+                Clicked="OnNextClicked" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

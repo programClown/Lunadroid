@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Lunadroid.App.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Lunadroid.App.Pages"
+    Title="Lunadroid"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.TabBarBackgroundColor="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}"
+    Shell.TabBarForegroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+    Shell.TabBarUnselectedColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant}, Dark={StaticResource OnSurfaceVariantDark}}">
+
+    <TabBar>
+        <Tab Title="主页">
+            <ShellContent Title="主页"
+                ContentTemplate="{DataTemplate pages:HomePage}"
+                Route="HomePage" />
+        </Tab>
+        <Tab Title="历史">
+            <ShellContent Title="历史"
+                ContentTemplate="{DataTemplate pages:HistoryPage}"
+                Route="HistoryPage" />
+        </Tab>
+        <Tab Title="我的">
+            <ShellContent Title="我的"
+                ContentTemplate="{DataTemplate pages:MySourcesPage}"
+                Route="MySourcesPage" />
+        </Tab>
+        <Tab Title="设置">
+            <ShellContent Title="设置"
+                ContentTemplate="{DataTemplate pages:SettingsPage}"
+                Route="SettingsPage" />
+        </Tab>
+    </TabBar>
+</Shell>

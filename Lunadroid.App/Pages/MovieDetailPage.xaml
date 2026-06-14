@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Lunadroid.App.Pages.MovieDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:Lunadroid.App.ViewModels"
+    Title="{Binding Detail.Title}"
+    x:DataType="viewmodels:MovieDetailViewModel"
+    BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#1A1A2E}">
+
+    <Grid>
+        <!-- Main Content -->
+        <ScrollView>
+            <VerticalStackLayout Spacing="16" Padding="16">
+
+                <!-- Movie Header -->
+                <Grid ColumnDefinitions="150,*" ColumnSpacing="16">
+                    <!-- Poster -->
+                    <Frame
+                        Grid.Column="0"
+                        WidthRequest="150"
+                        HeightRequest="200"
+                        CornerRadius="12"
+                        IsClippedToBounds="True"
+                        Padding="0"
+                        HasShadow="True">
+                        <Image
+                            Source="{Binding Detail.PosterUrl}"
+                            Aspect="AspectFill"
+                            WidthRequest="150"
+                            HeightRequest="200" />
+                    </Frame>
+
+                    <!-- Info -->
+                    <VerticalStackLayout
+                        Grid.Column="1"
+                        Spacing="8"
+                        VerticalOptions="Start">
+                        <Label
+                            Text="{Binding Detail.Title}"
+                            FontSize="22"
+                            FontAttributes="Bold"
+                            TextColor="{AppThemeBinding Light=#1A1A2E, Dark=#FFFFFF}"
+                            MaxLines="2"
+                            LineBreakMode="TailTruncation" />
+
+                        <!-- Rating -->
+                        <HorizontalStackLayout Spacing="4">
+                            <Label
+                                Text="★"
+                                FontSize="16"
+                                TextColor="#FFB800"
+                                VerticalOptions="Center" />
+                            <Label
+                                Text="{Binding Detail.Rating}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                TextColor="#FFB800"
+                                VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+
+                        <!-- Meta Info -->
+                        <Label
+                            Text="{Binding Detail.Year}"
+                            FontSize="13"
+                            TextColor="{AppThemeBinding Light=#777777, Dark=#999999}" />
+
+                        <Label
+                            Text="{Binding Detail.Category}"
+                            FontSize="13"
+                            TextColor="#6C63FF" />
+
+                        <Label
+                            Text="{Binding MovieData.SourceName}"
+                            FontSize="12"
+                            TextColor="{AppThemeBinding Light=#999999, Dark=#777777}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Description -->
+                <Frame
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#2A2A3E}"
+                    CornerRadius="12"
+                    HasShadow="False"
+                    Padding="14">
+                    <VerticalStackLayout Spacing="6">
+                        <Label
+                            Text="剧情简介"
+                            FontSize="15"
+                            FontAttributes="Bold"
+                            TextColor="{AppThemeBinding Light=#1A1A2E, Dark=#FFFFFF}" />
+                        <Label
+                            Text="{Binding Detail.Description}"
+                            FontSize="13"
+                            TextColor="{AppThemeBinding Light=#555555, Dark=#CCCCCC}"
+                            LineHeight="1.6" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Episodes Section -->
+                <Frame
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#2A2A3E}"
+                    CornerRadius="12"
+                    HasShadow="False"
+                    Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label
+                            Text="{Binding Episodes.Count, StringFormat='选集 ({0})'}"
+                            FontSize="15"
+                            FontAttributes="Bold"
+                            TextColor="{AppThemeBinding Light=#1A1A2E, Dark=#FFFFFF}" />
+
+                        <CollectionView
+                            ItemsSource="{Binding Episodes}"
+                            HeightRequest="400"
+                            SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout
+                                    Orientation="Vertical"
+                                    ItemSpacing="8" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                                        <!-- Episode Name -->
+                                        <Label
+                                            Grid.Column="0"
+                                            Text="{Binding EpisodeName}"
+                                            FontSize="14"
+                                            TextColor="{AppThemeBinding Light=#1A1A2E, Dark=#FFFFFF}"
+                                            VerticalOptions="Center"
+                                            MaxLines="1"
+                                            LineBreakMode="TailTruncation" />
+
+                                        <!-- Play Button -->
+                                        <Button
+                                            Grid.Column="1"
+                                            Text="播放"
+                                            FontSize="12"
+                                            TextColor="White"
+                                            BackgroundColor="#6C63FF"
+                                            CornerRadius="14"
+                                            HeightRequest="30"
+                                            WidthRequest="60"
+                                            Padding="4,2"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MovieDetailViewModel}}, Path=PlayEpisodeCommand}"
+                                            CommandParameter="{Binding .}" />
+
+                                        <!-- Download Button -->
+                                        <Button
+                                            Grid.Column="2"
+                                            Text="下载"
+                                            FontSize="12"
+                                            TextColor="White"
+                                            BackgroundColor="#00BFA5"
+                                            CornerRadius="14"
+                                            HeightRequest="30"
+                                            WidthRequest="60"
+                                            Padding="4,2"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MovieDetailViewModel}}, Path=DownloadEpisodeCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading Overlay -->
+        <Grid
+            IsVisible="{Binding IsLoading}"
+            BackgroundColor="#80000000">
+            <ActivityIndicator
+                IsRunning="{Binding IsLoading}"
+                Color="#6C63FF"
+                WidthRequest="48"
+                HeightRequest="48"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Grid>
+
+    </Grid>
+
+</ContentPage>
