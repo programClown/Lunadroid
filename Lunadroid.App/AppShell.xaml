@@ -3,33 +3,74 @@
     x:Class="Lunadroid.App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:material="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
     xmlns:pages="clr-namespace:Lunadroid.App.Pages"
     Title="Lunadroid"
     Shell.FlyoutBehavior="Disabled"
-    Shell.TabBarBackgroundColor="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}"
-    Shell.TabBarForegroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-    Shell.TabBarUnselectedColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant}, Dark={StaticResource OnSurfaceVariantDark}}">
+    Shell.TabBarBackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                  Dark={StaticResource SurfaceDark}}"
+    Shell.TabBarForegroundColor="{AppThemeBinding Light={StaticResource Primary},
+                                                  Dark={StaticResource PrimaryDark}}"
+    Shell.TabBarTitleColor="{AppThemeBinding Light={StaticResource Primary},
+                                             Dark={StaticResource PrimaryDark}}"
+    Shell.TabBarUnselectedColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                  Dark={StaticResource OnSurfaceVariantDark}}">
+
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style x:Key="BaseTabStyle" TargetType="Tab">
+                <Setter Property="Shell.TabBarIsVisible" Value="True" />
+            </Style>
+        </ResourceDictionary>
+    </Shell.Resources>
 
     <TabBar>
-        <Tab Title="主页">
-            <ShellContent Title="主页"
+        <Tab Title="主页" Route="Home">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="MaterialSymbolsOutlined"
+                    Glyph="{x:Static material:MaterialOutlined.Home}"
+                    Size="24"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource PrimaryDark}}" />
+            </Tab.Icon>
+            <ShellContent
+                Title="主页"
                 ContentTemplate="{DataTemplate pages:HomePage}"
                 Route="HomePage" />
         </Tab>
-        <Tab Title="历史">
-            <ShellContent Title="历史"
-                ContentTemplate="{DataTemplate pages:HistoryPage}"
-                Route="HistoryPage" />
+        <Tab Title="历史" Route="History">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="MaterialSymbolsOutlined"
+                    Glyph="{x:Static material:MaterialOutlined.History}"
+                    Size="24"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource PrimaryDark}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate pages:HistoryPage}" Route="HistoryPage" />
         </Tab>
-        <Tab Title="我的">
-            <ShellContent Title="我的"
-                ContentTemplate="{DataTemplate pages:MySourcesPage}"
-                Route="MySourcesPage" />
+        <Tab Title="设置" Route="Settings">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="MaterialSymbolsOutlined"
+                    Glyph="{x:Static material:MaterialOutlined.Settings}"
+                    Size="24"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource PrimaryDark}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate pages:SettingsPage}" Route="SettingsPage" />
         </Tab>
-        <Tab Title="设置">
-            <ShellContent Title="设置"
-                ContentTemplate="{DataTemplate pages:SettingsPage}"
-                Route="SettingsPage" />
+        <Tab Title="我的" Route="MySources">
+            <Tab.Icon>
+                <FontImageSource
+                    FontFamily="MaterialSymbolsOutlined"
+                    Glyph="{x:Static material:MaterialOutlined.Person}"
+                    Size="24"
+                    Color="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource PrimaryDark}}" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate pages:MySourcesPage}" Route="MySourcesPage" />
         </Tab>
     </TabBar>
 </Shell>

@@ -7,6 +7,7 @@ using Serilog;
 using UraniumUI;
 using UraniumUI.Material;
 using Microsoft.Extensions.Logging;
+using Mopups.Hosting;
 
 namespace Lunadroid.App;
 
@@ -17,14 +18,18 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .ConfigureMopups()
             .UseMauiCommunityToolkit()
             .UseMauiCommunityToolkitMediaElement(false)
             .UseUraniumUI()
             .UseUraniumUIMaterial()
+            .UseUraniumUIBlurs()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+
+                fonts.AddMaterialSymbolsFonts();
             });
 
         var appDataDir = FileSystem.AppDataDirectory;
@@ -62,6 +67,7 @@ public static class MauiProgram
             AppServices.HlsDownload = hlsDownload;
             AppServices.AppConfig = configService;
 
+            builder.Services.AddMopupsDialogs();
             // Register ViewModels
             builder.Services.AddTransient<HomeViewModel>();
             builder.Services.AddTransient<MovieDetailViewModel>();

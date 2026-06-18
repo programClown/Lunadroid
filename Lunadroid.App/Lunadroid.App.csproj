@@ -1,19 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net10.0-android</TargetFrameworks>
+		<TargetFramework>net10.0-android</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Lunadroid.App</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		
+		<!-- Enable Material 3 design on Android -->
+		<UseMaterial3>true</UseMaterial3>
 
+		<!-- Display name -->
 		<ApplicationTitle>Lunadroid</ApplicationTitle>
+
+		<!-- App Identifier -->
 		<ApplicationId>com.lunadroid.app</ApplicationId>
+		<ApplicationIdGuid>F175161E-7048-4E65-B7FA-655724A0B03D</ApplicationIdGuid>
+		
 		<ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
-
+		
+		<!-- To allow debugging via usb on real device -->
+		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+		
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">29.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
@@ -32,9 +43,10 @@
 		<PackageReference Include="CommunityToolkit.Maui" Version="14.2.0" />
 		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="10.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-		<PackageReference Include="UraniumUI" Version="2.16.0" />
-		<PackageReference Include="UraniumUI.Material" Version="2.16.0" />
-		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.16.0" />
+		<PackageReference Include="UraniumUI.Blurs" Version="3.0.0" />
+		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="3.0.0" />
+		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />
+		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="3.0.0" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
 		<PackageReference Include="Serilog" Version="4.3.1" />

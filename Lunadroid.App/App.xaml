@@ -1,25 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:material="clr-namespace:UraniumUI.Material.Themes;assembly=UraniumUI.Material"
-             x:Class="Lunadroid.App.App">
+<Application
+    x:Class="Lunadroid.App.App"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:resources="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <material:MaterialTheme />
-                <ResourceDictionary>
-                    <Color x:Key="Primary">#6750A4</Color>
-                    <Color x:Key="PrimaryDark">#D0BCFF</Color>
-                    <Color x:Key="Surface">#FFFBFE</Color>
-                    <Color x:Key="SurfaceDark">#1C1B1F</Color>
-                    <Color x:Key="OnSurface">#1C1B1F</Color>
-                    <Color x:Key="OnSurfaceDark">#E6E1E5</Color>
-                    <Color x:Key="OnSurfaceVariant">#49454F</Color>
-                    <Color x:Key="OnSurfaceVariantDark">#CAC4D0</Color>
-                    <Color x:Key="Background">#FFFBFE</Color>
-                    <Color x:Key="BackgroundDark">#1C1B1F</Color>
-                    <Color x:Key="StarColor">#FFC107</Color>
-                </ResourceDictionary>
+                <ResourceDictionary x:Name="appColors" Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary x:Name="appStyles" Source="Resources/Styles/Styles.xaml" />
+                <resources:StyleResource ColorsOverride="{x:Reference appColors}" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
