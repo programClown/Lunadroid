@@ -27,31 +27,49 @@
     <Tab Route="Home" Title="首页">
         <Tab.Icon>
             <FontImageSource
+                Color="{AppThemeBinding Light={StaticResource Primary},
+                                        Dark={StaticResource PrimaryDark}}"
                 FontFamily="MaterialOutlined"
                 Glyph="{x:Static material:MaterialOutlined.Home}"
                 Size="24" />
         </Tab.Icon>
-        <ShellContent ContentTemplate="{DataTemplate views:HomePage}" Route="DashboardPage" />
+        <ShellContent ContentTemplate="{DataTemplate views:HomePage}" Route="HomePage" />
     </Tab>
 
-    <Tab Route="Settings" Title="设置">
+    <Tab Route="Download" Title="下载">
         <Tab.Icon>
             <FontImageSource
+                Color="{AppThemeBinding Light={StaticResource Primary},
+                                        Dark={StaticResource PrimaryDark}}"
                 FontFamily="MaterialOutlined"
-                Glyph="{x:Static material:MaterialOutlined.Settings}"
+                Glyph="{x:Static material:MaterialOutlined.Download}"
                 Size="24" />
         </Tab.Icon>
-        <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" Route="DashboardPage" />
+        <ShellContent ContentTemplate="{DataTemplate views:DownloadPage}" Route="DownloadPage" />
+    </Tab>
+
+    <Tab Route="History" Title="历史">
+        <Tab.Icon>
+            <FontImageSource
+                Color="{AppThemeBinding Light={StaticResource Primary},
+                                        Dark={StaticResource PrimaryDark}}"
+                FontFamily="MaterialOutlined"
+                Glyph="{x:Static material:MaterialOutlined.History}"
+                Size="24" />
+        </Tab.Icon>
+        <ShellContent ContentTemplate="{DataTemplate views:HistoryPage}" Route="HistoryPage" />
     </Tab>
 
     <Tab Route="Profile" Title="我的">
         <Tab.Icon>
             <FontImageSource
+                Color="{AppThemeBinding Light={StaticResource Primary},
+                                        Dark={StaticResource PrimaryDark}}"
                 FontFamily="MaterialOutlined"
                 Glyph="{x:Static material:MaterialOutlined.Person}"
                 Size="24" />
         </Tab.Icon>
-        <ShellContent ContentTemplate="{DataTemplate views:ProfilePage}" Route="DashboardPage" />
+        <ShellContent ContentTemplate="{DataTemplate views:ProfilePage}" Route="ProfilePage" />
     </Tab>
 
 </Shell>
