@@ -1,5 +1,7 @@
 <Solution>
-  <Project Path="Lunadroid.App/Lunadroid.App.csproj" />
+  <Project Path="Lunadroid.App/Lunadroid.App.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
   <Project Path="Lunadroid.Core/Lunadroid.Core.csproj" />
   <Project Path="Lunadroid.Tests/Lunadroid.Tests.csproj" />
 </Solution>
