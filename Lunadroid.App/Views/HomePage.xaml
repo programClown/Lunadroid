@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
-             x:Class="Lunadroid.App.Views.HomePage"
-             Title="首页">
+
+<uranium:UraniumContentPage
+    Title="首页"
+    x:Class="Lunadroid.App.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
     <ContentPage.ToolbarItems>
-        <ToolbarItem
-            Text="本地播放"/>
-        <ToolbarItem
-            Text="无所谓"/>
+        <ToolbarItem Text="本地播放" />
+        <ToolbarItem Text="无所谓" />
     </ContentPage.ToolbarItems>
+
+    <toolkit:MediaElement
+        ShouldAutoPlay="True"
+        Source="https://vod.360zyx.vip/20250708/7T2xjBRd/index.m3u8"
+        x:Name="MediaElement" />
 </uranium:UraniumContentPage>

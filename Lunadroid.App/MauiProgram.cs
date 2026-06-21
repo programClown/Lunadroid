@@ -1,36 +1,36 @@
-﻿using Mopups.Hosting;
-using UraniumUI.Icons.MaterialSymbols;
-using InputKit.Shared.Controls;
-using UraniumUI;
+﻿using CommunityToolkit.Maui;
+using Lunadroid.App.ViewModels;
 using Lunadroid.Core.Services;
+using UraniumUI;
 
 namespace Lunadroid.App;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
-			.ConfigureMopups()
-			.UseUraniumUI()
-			.UseUraniumUIMaterial()
-			.ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
+            .UseMauiCommunityToolkitMediaElement(true)
+            .UseUraniumUI()
+            .UseUraniumUIMaterial()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 
-				fonts.AddMaterialSymbolsFonts();
-
+                fonts.AddMaterialSymbolsFonts();
             });
 
-		builder.Services.AddMopupsDialogs();
+        builder.Services.AddCommunityToolkitDialogs();
 
-        // DatabaseService registered as singleton — App.cs resolves and inits it
         var dbPath = Path.Combine(FileSystem.AppDataDirectory, "lunadroid.db");
         builder.Services.AddSingleton(new DatabaseService(dbPath));
+        builder.Services.AddSingleton<MovieApiService>();
+        builder.Services.AddTransient<HomePageViewModel>();
 
         return builder.Build();
-	}
+    }
 }

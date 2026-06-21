@@ -1,68 +1,70 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<MauiVersion>10.0.71</MauiVersion>
-		<UraniumUIVersion>2.16.0</UraniumUIVersion>
-		<TargetFramework>net10.0-android</TargetFramework>
-		
-		<OutputType>Exe</OutputType>
-		<RootNamespace>Lunadroid.App</RootNamespace>
-		<UseMaui>true</UseMaui>
-		<SingleProject>true</SingleProject>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
+    <PropertyGroup>
+        <MauiVersion>10.0.71</MauiVersion>
+        <UraniumUIVersion>2.16.0</UraniumUIVersion>
+        <TargetFramework>net10.0-android</TargetFramework>
 
-		<!-- Display name -->
-		<ApplicationTitle>Lunadroid</ApplicationTitle>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>Lunadroid.App</RootNamespace>
+        <UseMaui>true</UseMaui>
+        <SingleProject>true</SingleProject>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
 
-		<!-- App Identifier -->
-		<ApplicationId>com.companyname.lunadroid.app</ApplicationId>
-		<ApplicationIdGuid>5d63d866-be76-4e06-8213-c754aed9459c</ApplicationIdGuid>
+        <!-- Display name -->
+        <ApplicationTitle>Lunadroid</ApplicationTitle>
 
-		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
-	
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-	</PropertyGroup>
+        <!-- App Identifier -->
+        <ApplicationId>com.lunadroid.app</ApplicationId>
+        <ApplicationIdGuid>5d63d866-be76-4e06-8213-c754aed9459c</ApplicationIdGuid>
 
-	<ItemGroup>
-		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#06B6D4" />
+        <!-- Versions -->
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
 
-		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0B1120" BaseSize="128,128" />
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
+    </PropertyGroup>
 
-		<!-- Images -->
-		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
+    <ItemGroup>
+        <!-- App Icon -->
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#06B6D4"/>
 
-		<!-- Custom Fonts -->
-		<MauiFont Include="Resources\Fonts\*" />
+        <!-- Splash Screen -->
+        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0B1120" BaseSize="128,128"/>
 
-		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
+        <!-- Images -->
+        <MauiImage Include="Resources\Images\*"/>
+        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208"/>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-		<PackageReference Include="UraniumUI.Material" Version="$(UraniumUIVersion)" />
-		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="$(UraniumUIVersion)" />
-		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="$(UraniumUIVersion)" />
-	</ItemGroup>
+        <!-- Custom Fonts -->
+        <MauiFont Include="Resources\Fonts\*"/>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\Lunadroid.Core\Lunadroid.Core.csproj" />
-	</ItemGroup>
+        <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
+    </ItemGroup>
 
-	<ItemGroup>
-	  <MauiXaml Update="Views\DownloadPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\HistoryPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)"/>
+        <PackageReference Include="CommunityToolkit.Maui" Version="14.2.0"/>
+        <PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="10.0.0"/>
+        <PackageReference Include="UraniumUI.Material" Version="$(UraniumUIVersion)"/>
+        <PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="$(UraniumUIVersion)"/>
+        <PackageReference Include="UraniumUI.Dialogs.CommunityToolkit" Version="$(UraniumUIVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Lunadroid.Core\Lunadroid.Core.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <MauiXaml Update="Views\DownloadPage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+        <MauiXaml Update="Views\HistoryPage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </MauiXaml>
+    </ItemGroup>
 
 </Project>

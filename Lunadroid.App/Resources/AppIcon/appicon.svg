@@ -2,22 +2,22 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512">
 	<defs>
 		<linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-			<stop offset="0%" style="stop-color:#A855F7;stop-opacity:1" />
-			<stop offset="100%" style="stop-color:#3B0764;stop-opacity:1" />
+			<stop offset="0%" style="stop-color:#06B6D4;stop-opacity:1" />
+			<stop offset="100%" style="stop-color:#164E63;stop-opacity:1" />
 		</linearGradient>
 	</defs>
 	<rect x="32" y="32" width="448" height="448" rx="48" fill="url(#grad1)"/>
 	<g transform="translate(256,256)">
 		<g transform="rotate(-45)">
 			<rect x="-90" y="-120" width="180" height="24" rx="3" fill="#FFFFFF"/>
-			<rect x="-90" y="-120" width="30" height="24" rx="3" fill="#E0AAFF"/>
-			<rect x="-50" y="-120" width="30" height="24" rx="3" fill="#E0AAFF"/>
-			<rect x="-10" y="-120" width="30" height="24" rx="3" fill="#E0AAFF"/>
-			<rect x="30" y="-120" width="30" height="24" rx="3" fill="#E0AAFF"/>
-			<rect x="60" y="-120" width="30" height="24" rx="3" fill="#E0AAFF"/>
+			<rect x="-90" y="-120" width="30" height="24" rx="3" fill="#CFFAFE"/>
+			<rect x="-50" y="-120" width="30" height="24" rx="3" fill="#CFFAFE"/>
+			<rect x="-10" y="-120" width="30" height="24" rx="3" fill="#CFFAFE"/>
+			<rect x="30" y="-120" width="30" height="24" rx="3" fill="#CFFAFE"/>
+			<rect x="60" y="-120" width="30" height="24" rx="3" fill="#CFFAFE"/>
 		</g>
-		<rect x="-70" y="-30" width="140" height="100" rx="8" fill="#1A0A2E" stroke="#FFFFFF" stroke-width="4"/>
-		<rect x="-58" y="-18" width="116" height="76" rx="4" fill="#2D1B69"/>
-		<polygon points="-20,-8 -20,48 30,20" fill="#C084FC"/>
+		<rect x="-70" y="-30" width="140" height="100" rx="8" fill="#083344" stroke="#FFFFFF" stroke-width="4"/>
+		<rect x="-58" y="-18" width="116" height="76" rx="4" fill="#0E7490"/>
+		<polygon points="-20,-8 -20,48 30,20" fill="#22D3EE"/>
 	</g>
 </svg>
