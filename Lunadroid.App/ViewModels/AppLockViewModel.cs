@@ -8,6 +8,14 @@ public partial class AppLockViewModel : BaseViewModel
 {
     private readonly AppConfigService _configService;
 
+    [ObservableProperty] private bool _hasPin1;
+
+    [ObservableProperty] private bool _hasPin2;
+
+    [ObservableProperty] private bool _hasPin3;
+
+    [ObservableProperty] private bool _hasPin4;
+
     [ObservableProperty] private bool _isSetup;
 
     [ObservableProperty] private bool _isVerifying;
@@ -24,12 +32,24 @@ public partial class AppLockViewModel : BaseViewModel
         IsSetup = !configService.Config.SecurityLockEnabled;
     }
 
+    partial void OnPinEntryChanged(string value)
+    {
+        HasPin1 = value.Length >= 1;
+        HasPin2 = value.Length >= 2;
+        HasPin3 = value.Length >= 3;
+        HasPin4 = value.Length >= 4;
+    }
+
     [RelayCommand]
-    private void AppendPin(string digit)
+    private async Task AppendPin(string digit)
     {
         if (PinEntry.Length < 4)
         {
             PinEntry += digit;
+            if (PinEntry.Length == 4)
+            {
+                await ValidatePin();
+            }
         }
     }
 
@@ -49,15 +69,8 @@ public partial class AppLockViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
-    private async Task ConfirmPin()
+    private async Task ValidatePin()
     {
-        if (PinEntry.Length != 4)
-        {
-            StatusMessage = "请输入4位数字密码";
-            return;
-        }
-
         if (IsVerifying)
         {
             if (PinEntry == _configService.Config.PinCode)

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <uranium:UraniumContentPage
     BackgroundColor="{AppThemeBinding Light={StaticResource Background},
@@ -46,15 +46,80 @@
                 TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
                                             Dark={StaticResource OnSurfaceVariantDark}}" />
 
-            <!--  PIN Display as masked text  -->
-            <Label
-                CharacterSpacing="12"
-                FontAttributes="Bold"
-                FontSize="32"
-                HorizontalOptions="Center"
-                Text="{Binding PinEntry, StringFormat='****'}"
-                TextColor="{AppThemeBinding Light={StaticResource Primary},
-                                            Dark={StaticResource PrimaryDark}}" />
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
+                <Border
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    HeightRequest="48"
+                    WidthRequest="48">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="48"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding HasPin1}"
+                        Text="*"
+                        TextColor="{AppThemeBinding Light={StaticResource Primary},
+                                                    Dark={StaticResource PrimaryDark}}"
+                        VerticalOptions="Center" />
+                </Border>
+                <Border
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    HeightRequest="48"
+                    WidthRequest="48">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="48"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding HasPin2}"
+                        Text="*"
+                        TextColor="{AppThemeBinding Light={StaticResource Primary},
+                                                    Dark={StaticResource PrimaryDark}}"
+                        VerticalOptions="Center" />
+                </Border>
+                <Border
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    HeightRequest="48"
+                    WidthRequest="48">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="48"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding HasPin3}"
+                        Text="*"
+                        TextColor="{AppThemeBinding Light={StaticResource Primary},
+                                                    Dark={StaticResource PrimaryDark}}"
+                        VerticalOptions="Center" />
+                </Border>
+                <Border
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    HeightRequest="48"
+                    WidthRequest="48">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="48"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding HasPin4}"
+                        Text="*"
+                        TextColor="{AppThemeBinding Light={StaticResource Primary},
+                                                    Dark={StaticResource PrimaryDark}}"
+                        VerticalOptions="Center" />
+                </Border>
+            </HorizontalStackLayout>
 
             <!--  Status Message  -->
             <Label
@@ -177,7 +242,8 @@
                                                 Dark={StaticResource OnSurfaceDark}}" />
 
                 <Button
-                    BackgroundColor="Transparent"
+                    BackgroundColor="{AppThemeBinding Light=#D5D5D5,
+                                                      Dark=#3A3A3A}"
                     Command="{Binding ClearPinCommand}"
                     FontSize="14"
                     Grid.Column="0"
@@ -208,23 +274,13 @@
             </Grid>
         </VerticalStackLayout>
 
-        <HorizontalStackLayout
+        <Button
+            Command="{Binding SkipLockCommand}"
+            FontSize="14"
             Grid.Row="1"
             HorizontalOptions="Center"
+            IsVisible="{Binding IsSetup}"
             Margin="0,0,0,16"
-            Spacing="12">
-            <Button
-                BackgroundColor="{StaticResource Primary}"
-                Command="{Binding ConfirmPinCommand}"
-                FontSize="16"
-                Text="确认"
-                TextColor="White" />
-
-            <Button
-                Command="{Binding SkipLockCommand}"
-                FontSize="14"
-                IsVisible="{Binding IsSetup}"
-                Text="跳过" />
-        </HorizontalStackLayout>
+            Text="跳过" />
     </Grid>
 </uranium:UraniumContentPage>
