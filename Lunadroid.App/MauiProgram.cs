@@ -27,11 +27,19 @@ public static class MauiProgram
 
         builder.Services.AddCommunityToolkitDialogs();
 
+        // Database
         var publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
         var dbPath = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "lunadroid.db");
         builder.Services.AddSingleton(new DatabaseService(dbPath));
+
+        // Config
+        builder.Services.AddSingleton(new AppConfigService(Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app")));
+
         builder.Services.AddSingleton<MovieApiService>();
-        builder.Services.AddTransient<HomePageViewModel>();
+        builder.Services.AddTransient<WelcomeViewModel>();
+        builder.Services.AddTransient<TermsViewModel>();
+        builder.Services.AddTransient<AppLockViewModel>();
+        builder.Services.AddTransient<HomeViewModel>();
 
         return builder.Build();
     }

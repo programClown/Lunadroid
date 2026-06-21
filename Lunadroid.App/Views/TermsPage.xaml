@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<uranium:UraniumContentPage
+    BackgroundColor="{AppThemeBinding Light={StaticResource Background},
+                                      Dark={StaticResource BackgroundDark}}"
+    Title="使用条款"
+    x:Class="Lunadroid.App.Views.TermsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Grid Padding="24" RowDefinitions="Auto,*,Auto">
+        <Label
+            FontAttributes="Bold"
+            FontSize="24"
+            Grid.Row="0"
+            Margin="0,16,0,16"
+            Text="使用条款"
+            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                        Dark={StaticResource OnSurfaceDark}}" />
+
+        <Border Grid.Row="1" Margin="0,0,0,16">
+            <ScrollView>
+                <VerticalStackLayout Padding="4" Spacing="12">
+                    <Label
+                        FontSize="14"
+                        HorizontalOptions="Fill"
+                        LineHeight="1.6"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                    Dark={StaticResource OnSurfaceVariantDark}}">
+                        <Label.Text>
+                            欢迎使用 Lunadroid。在使用本应用前，请仔细阅读以下条款：
+                            1. 免责声明
+                            Lunadroid 仅作为影视资源的聚合搜索工具，不提供任何影视内容的存储或分发。所有搜索结果均来自第三方影视源，Lunadroid 不对第三方内容的合法性、准确性或可用性负责。
+                            2. 使用规范
+                            您应确保在使用本应用时遵守当地法律法规。用户应自行判断所访问内容的合法性，并对自己的行为负责。
+                            3. 数据隐私
+                            本应用的数据存储在您的本地设备上。应用可能访问网络以搜索影视资源和下载内容。我们不会收集或上传您的个人数据。
+                            4. 知识产权
+                            请尊重影视作品的知识产权。下载的内容仅供个人学习研究使用，请在24小时内删除。
+                            5. 风险承担
+                            使用第三方影视源可能存在安全风险。Lunadroid 不对因使用第三方源而造成的任何损失负责。
+                            6. 条款修改
+                            我们保留随时修改这些条款的权利。继续使用本应用即表示您接受修改后的条款。
+                        </Label.Text>
+                    </Label>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+        <VerticalStackLayout Grid.Row="2" Spacing="12">
+            <HorizontalStackLayout Spacing="8">
+                <CheckBox Color="{StaticResource Primary}" IsChecked="{Binding TermsChecked}" />
+                <Label
+                    FontSize="14"
+                    Text="我已阅读并同意以上使用条款"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}"
+                    VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnTermsLabelTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+
+            <Button
+                BackgroundColor="{StaticResource Primary}"
+                Command="{Binding AcceptTermsCommand}"
+                FontSize="16"
+                HeightRequest="52"
+                IsEnabled="{Binding TermsChecked}"
+                Text="同意并继续"
+                TextColor="White" />
+        </VerticalStackLayout>
+    </Grid>
+</uranium:UraniumContentPage>

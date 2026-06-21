@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<uranium:UraniumContentPage
+    x:Class="Lunadroid.App.Views.WelcomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <Grid Padding="32" RowDefinitions="*,Auto">
+        <VerticalStackLayout
+            Grid.Row="0"
+            HorizontalOptions="Center"
+            Spacing="24"
+            VerticalOptions="Center">
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="32"
+                HorizontalOptions="Center"
+                Text="Lunadroid"
+                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                            Dark={StaticResource OnSurfaceDark}}" />
+
+            <Label
+                FontSize="18"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Text="您的私人影视中心"
+                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                            Dark={StaticResource OnSurfaceVariantDark}}" />
+
+            <BoxView
+                Color="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                        Dark={StaticResource OutlineVariantDark}}"
+                HeightRequest="1"
+                Margin="0,8" />
+
+            <Label
+                FontSize="15"
+                HorizontalTextAlignment="Center"
+                LineHeight="1.6"
+                MaxLines="5"
+                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                            Dark={StaticResource OnSurfaceVariantDark}}">
+                <Label.Text>
+                    搜索海量影视资源，在线播放高清HLS视频流，支持离线下载到本地观看。管理您的影视源、播放历史和下载记录。
+                </Label.Text>
+            </Label>
+
+            <VerticalStackLayout Margin="0,16,0,0" Spacing="12">
+                <HorizontalStackLayout Spacing="12">
+                    <Label
+                        FontSize="14"
+                        Text="&#x25CF;"
+                        TextColor="{StaticResource Primary}" />
+                    <Label
+                        FontSize="14"
+                        Text="多源聚合搜索"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                    Dark={StaticResource OnSurfaceVariantDark}}" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="12">
+                    <Label
+                        FontSize="14"
+                        Text="&#x25CF;"
+                        TextColor="{StaticResource Secondary}" />
+                    <Label
+                        FontSize="14"
+                        Text="HLS在线播放"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                    Dark={StaticResource OnSurfaceVariantDark}}" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="12">
+                    <Label
+                        FontSize="14"
+                        Text="&#x25CF;"
+                        TextColor="{StaticResource Tertiary}" />
+                    <Label
+                        FontSize="14"
+                        Text="离线下载观看"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                    Dark={StaticResource OnSurfaceVariantDark}}" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+
+        <Button
+            BackgroundColor="{StaticResource Primary}"
+            Command="{Binding GetStartedCommand}"
+            FontSize="16"
+            Grid.Row="1"
+            HeightRequest="52"
+            Text="开始使用"
+            TextColor="White" />
+    </Grid>
+</uranium:UraniumContentPage>

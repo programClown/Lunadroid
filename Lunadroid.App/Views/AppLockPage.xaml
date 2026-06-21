@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<uranium:UraniumContentPage
+    BackgroundColor="{AppThemeBinding Light={StaticResource Background},
+                                      Dark={StaticResource BackgroundDark}}"
+    x:Class="Lunadroid.App.Views.AppLockPage"
+    x:DataType="vm:AppLockViewModel"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <Grid Padding="32" RowDefinitions="*,Auto">
+        <VerticalStackLayout
+            Grid.Row="0"
+            HorizontalOptions="Center"
+            Spacing="24"
+            VerticalOptions="Center">
+
+            <Border
+                HeightRequest="80"
+                HorizontalOptions="Center"
+                Padding="0"
+                WidthRequest="80">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="40" />
+                </Border.StrokeShape>
+                <Label
+                    FontSize="36"
+                    HorizontalOptions="Center"
+                    Text="&#x1F512;"
+                    VerticalOptions="Center" />
+            </Border>
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="24"
+                HorizontalOptions="Center"
+                Text="{Binding Title}"
+                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                            Dark={StaticResource OnSurfaceDark}}" />
+
+            <Label
+                FontSize="14"
+                HorizontalOptions="Center"
+                Text="请输入4位数字密码"
+                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                            Dark={StaticResource OnSurfaceVariantDark}}" />
+
+            <!--  PIN Display as masked text  -->
+            <Label
+                CharacterSpacing="12"
+                FontAttributes="Bold"
+                FontSize="32"
+                HorizontalOptions="Center"
+                Text="{Binding PinEntry, StringFormat='****'}"
+                TextColor="{AppThemeBinding Light={StaticResource Primary},
+                                            Dark={StaticResource PrimaryDark}}" />
+
+            <!--  Status Message  -->
+            <Label
+                FontSize="13"
+                HorizontalOptions="Center"
+                IsVisible="{Binding StatusMessage, Converter={StaticResource StringIsNotNullOrEmptyConverter}}"
+                Text="{Binding StatusMessage}"
+                TextColor="{StaticResource Error}" />
+
+            <!--  Numeric Keypad  -->
+            <Grid
+                ColumnDefinitions="*,*,*"
+                ColumnSpacing="12"
+                HeightRequest="320"
+                HorizontalOptions="Center"
+                RowDefinitions="*,*,*,*"
+                RowSpacing="12"
+                WidthRequest="240">
+
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="1"
+                    FontSize="22"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    Text="1"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="2"
+                    FontSize="22"
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Text="2"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="3"
+                    FontSize="22"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    Text="3"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="4"
+                    FontSize="22"
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Text="4"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="5"
+                    FontSize="22"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Text="5"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="6"
+                    FontSize="22"
+                    Grid.Column="2"
+                    Grid.Row="1"
+                    Text="6"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="7"
+                    FontSize="22"
+                    Grid.Column="0"
+                    Grid.Row="2"
+                    Text="7"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="8"
+                    FontSize="22"
+                    Grid.Column="1"
+                    Grid.Row="2"
+                    Text="8"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="9"
+                    FontSize="22"
+                    Grid.Column="2"
+                    Grid.Row="2"
+                    Text="9"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+
+                <Button
+                    BackgroundColor="Transparent"
+                    Command="{Binding ClearPinCommand}"
+                    FontSize="14"
+                    Grid.Column="0"
+                    Grid.Row="3"
+                    Text="清除"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                Dark={StaticResource OnSurfaceVariantDark}}" />
+                <Button
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                      Dark={StaticResource SurfaceVariantDark}}"
+                    Command="{Binding AppendPinCommand}"
+                    CommandParameter="0"
+                    FontSize="22"
+                    Grid.Column="1"
+                    Grid.Row="3"
+                    Text="0"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource OnSurfaceDark}}" />
+                <Button
+                    BackgroundColor="Transparent"
+                    Command="{Binding DeletePinCommand}"
+                    FontSize="22"
+                    Grid.Column="2"
+                    Grid.Row="3"
+                    Text="&#x232B;"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                Dark={StaticResource OnSurfaceVariantDark}}" />
+            </Grid>
+        </VerticalStackLayout>
+
+        <HorizontalStackLayout
+            Grid.Row="1"
+            HorizontalOptions="Center"
+            Margin="0,0,0,16"
+            Spacing="12">
+            <Button
+                BackgroundColor="{StaticResource Primary}"
+                Command="{Binding ConfirmPinCommand}"
+                FontSize="16"
+                Text="确认"
+                TextColor="White" />
+
+            <Button
+                Command="{Binding SkipLockCommand}"
+                FontSize="14"
+                IsVisible="{Binding IsSetup}"
+                Text="跳过" />
+        </HorizontalStackLayout>
+    </Grid>
+</uranium:UraniumContentPage>

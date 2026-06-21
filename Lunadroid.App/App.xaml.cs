@@ -1,4 +1,5 @@
-﻿using Lunadroid.Core.Services;
+﻿using Lunadroid.App.Views;
+using Lunadroid.Core.Services;
 using Environment = Android.OS.Environment;
 
 namespace Lunadroid.App;
@@ -15,6 +16,8 @@ public partial class App : Application
         // Kick off init — when done, signal _dbReady
         _ = InitializeAsync(databaseService);
     }
+
+    public static IServiceProvider Services => IPlatformApplication.Current!.Services;
 
     private async Task InitializeAsync(DatabaseService databaseService)
     {
@@ -41,7 +44,7 @@ public partial class App : Application
     {
         // Return a blank window immediately so the splash screen can dismiss.
         // Once the DB is ready, swap the window's page to the correct start page.
-        var window = new Window(new ContentPage()); // blank placeholder
+        var window = new Window(new WelcomePage()); // blank placeholder
 
         _ = SetStartPageAsync(window);
 
@@ -54,10 +57,24 @@ public partial class App : Application
         {
             // Wait for DB init + seeding to finish before reading settings
             await _dbReady.Task;
+            var appConfigService = Services.GetRequiredService<AppConfigService>();
+            var config = appConfigService.Config;
 
-            var startPage = new AppShell();
+            Page startPage;
 
-            // Switch to the real page on the UI thread
+            if (!config.OnboardingCompleted)
+            {
+                startPage = new WelcomePage();
+            }
+            else if (config.SecurityLockEnabled)
+            {
+                startPage = new AppLockPage(true);
+            }
+            else
+            {
+                startPage = new AppShell();
+            }
+
             window.Page = startPage;
         }
         catch (Exception ex)

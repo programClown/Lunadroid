@@ -1,9 +1,23 @@
+using Lunadroid.App.ViewModels;
+using UraniumUI.Pages;
+
 namespace Lunadroid.App.Views;
 
-public partial class HomePage : UraniumUI.Pages.UraniumContentPage
+public partial class HomePage : UraniumContentPage
 {
-	public HomePage()
-	{
-		InitializeComponent();
-	}
+    public HomePage(HomeViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is HomeViewModel vm)
+        {
+            await vm.InitializeAsync();
+        }
+    }
 }
