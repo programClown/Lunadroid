@@ -1,4 +1,5 @@
 ﻿using Lunadroid.Core.Services;
+using Environment = Android.OS.Environment;
 
 namespace Lunadroid.App;
 
@@ -19,11 +20,19 @@ public partial class App : Application
     {
         try
         {
+            // Initialize logging
+            var publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
+            var logDir = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "logs");
+            LoggingService.Initialize(logDir);
+            LoggingService.Info("App starting...");
+
+            // Initialize database synchronously-fast (CreateTableAsync is ~20ms per table)
             await databaseService.InitializeAsync();
             _dbReady.TrySetResult();
         }
         catch (Exception ex)
         {
+            LoggingService.Error("App initialization failed", ex);
             _dbReady.TrySetException(ex);
         }
     }

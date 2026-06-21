@@ -2,6 +2,7 @@
 using Lunadroid.App.ViewModels;
 using Lunadroid.Core.Services;
 using UraniumUI;
+using Environment = Android.OS.Environment;
 
 namespace Lunadroid.App;
 
@@ -13,7 +14,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
-            .UseMauiCommunityToolkitMediaElement(true)
+            .UseMauiCommunityToolkitMediaElement(false) // false to avoid Android foreground service crash
             .UseUraniumUI()
             .UseUraniumUIMaterial()
             .ConfigureFonts(fonts =>
@@ -26,7 +27,8 @@ public static class MauiProgram
 
         builder.Services.AddCommunityToolkitDialogs();
 
-        var dbPath = Path.Combine(FileSystem.AppDataDirectory, "lunadroid.db");
+        var publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
+        var dbPath = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "lunadroid.db");
         builder.Services.AddSingleton(new DatabaseService(dbPath));
         builder.Services.AddSingleton<MovieApiService>();
         builder.Services.AddTransient<HomePageViewModel>();
