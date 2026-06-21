@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentView
+    x:Class="Lunadroid.App.Controls.VideoPlayer"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:material="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+    xmlns:media="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui.MediaElement"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <Grid RowDefinitions="*,Auto" x:Name="PlayerRoot">
+
+        <media:MediaElement
+            Aspect="AspectFit"
+            HorizontalOptions="Fill"
+            MediaEnded="OnMediaEnded"
+            MediaFailed="OnMediaFailed"
+            PositionChanged="OnPositionChanged"
+            SeekCompleted="OnSeekCompleted"
+            StateChanged="OnStateChanged"
+            VerticalOptions="Fill"
+            x:Name="MediaPlayer" />
+
+        <ActivityIndicator
+            Color="{StaticResource Primary}"
+            HeightRequest="40"
+            HorizontalOptions="Center"
+            IsRunning="False"
+            VerticalOptions="Center"
+            WidthRequest="40"
+            x:Name="BufferingIndicator" />
+
+        <Grid
+            Grid.Row="0"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill"
+            x:Name="TapOverlay">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnOverlayTapped" />
+            </Grid.GestureRecognizers>
+        </Grid>
+
+        <Grid
+            Grid.Row="0"
+            RowDefinitions="Auto,*,Auto"
+            VerticalOptions="Fill"
+            x:Name="ControlsOverlay">
+
+            <Grid
+                BackgroundColor="#80000000"
+                Grid.Row="0"
+                Padding="12,8">
+                <Label
+                    FontSize="16"
+                    TextColor="White"
+                    VerticalOptions="Center"
+                    x:Name="TitleLabel" />
+            </Grid>
+
+            <Grid
+                Grid.Row="1"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill">
+
+                <ImageButton
+                    BackgroundColor="#80000000"
+                    Clicked="OnCenterPlayClicked"
+                    HeightRequest="56"
+                    HorizontalOptions="Center"
+                    Source="{FontImageSource FontFamily=MaterialOutlined,
+                                             Glyph={x:Static material:MaterialOutlined.Play_arrow},
+                                             Size=28,
+                                             Color=White}"
+                    VerticalOptions="Center"
+                    WidthRequest="56"
+                    x:Name="CenterPlayButton" />
+            </Grid>
+
+            <Grid
+                BackgroundColor="#80000000"
+                ColumnDefinitions="Auto,*,Auto"
+                Grid.Row="2"
+                Padding="12,8"
+                RowDefinitions="Auto,Auto">
+
+                <Label
+                    FontSize="12"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    Margin="0,0,8,0"
+                    Text="00:00"
+                    TextColor="White"
+                    VerticalOptions="Center"
+                    x:Name="CurrentTimeLabel" />
+
+                <Slider
+                    DragCompleted="OnSeekDragCompleted"
+                    DragStarted="OnSeekDragStarted"
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    MaximumTrackColor="#80FFFFFF"
+                    MinimumTrackColor="{StaticResource Primary}"
+                    ThumbColor="White"
+                    ValueChanged="OnProgressSliderChanged"
+                    x:Name="ProgressSlider" />
+
+                <Label
+                    FontSize="12"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    Margin="8,0,0,0"
+                    Text="00:00"
+                    TextColor="White"
+                    VerticalOptions="Center"
+                    x:Name="DurationLabel" />
+
+                <HorizontalStackLayout
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Grid.Row="1"
+                    Margin="0,6,0,0"
+                    Spacing="16">
+
+                    <ImageButton
+                        BackgroundColor="Transparent"
+                        Clicked="OnPlayPauseClicked"
+                        HeightRequest="36"
+                        Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                 Glyph={x:Static material:MaterialOutlined.Play_arrow},
+                                                 Size=22,
+                                                 Color=White}"
+                        WidthRequest="36"
+                        x:Name="PlayPauseButton" />
+
+                    <ImageButton
+                        BackgroundColor="Transparent"
+                        Clicked="OnMuteClicked"
+                        HeightRequest="36"
+                        Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                 Glyph={x:Static material:MaterialOutlined.Volume_up},
+                                                 Size=22,
+                                                 Color=White}"
+                        WidthRequest="36"
+                        x:Name="MuteButton" />
+
+                    <Slider
+                        MaximumTrackColor="#80FFFFFF"
+                        MinimumTrackColor="White"
+                        ThumbColor="White"
+                        ValueChanged="OnVolumeChanged"
+                        VerticalOptions="Center"
+                        WidthRequest="100"
+                        x:Name="VolumeSlider" />
+
+                    <Button
+                        BackgroundColor="Transparent"
+                        Clicked="OnSpeedClicked"
+                        FontSize="13"
+                        HeightRequest="36"
+                        Padding="4,0"
+                        Text="1.0x"
+                        TextColor="White"
+                        VerticalOptions="Center"
+                        x:Name="SpeedButton" />
+
+                    <ImageButton
+                        BackgroundColor="Transparent"
+                        Clicked="OnFullscreenClicked"
+                        HeightRequest="36"
+                        Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                 Glyph={x:Static material:MaterialOutlined.Fullscreen},
+                                                 Size=22,
+                                                 Color=White}"
+                        WidthRequest="36"
+                        x:Name="FullscreenButton" />
+                </HorizontalStackLayout>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentView>
