@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Lunadroid.Core.Models;
 
 public class AppConfig
@@ -12,48 +10,13 @@ public class AppConfig
     public bool BiometricEnabled { get; set; }
     public string CloudSourceUrl { get; set; } = "https://pz.v88.qzz.io/?format=0&source=full";
     public string DownloadDirectory { get; set; } = string.Empty;
-}
 
-public class CloudSourceItem
-{
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
-    [JsonPropertyName("api")]
-    public string Api { get; set; } = string.Empty;
-    [JsonPropertyName("url")]
-    public string Url { get; set; } = string.Empty;
-    [JsonPropertyName("adult")]
-    public bool Adult { get; set; }
-}
-
-public class MovieSearchResult
-{
-    public string Id { get; set; } = string.Empty;
-    public string Title { get; set; } = string.Empty;
-    public string PosterUrl { get; set; } = string.Empty;
-    public double Rating { get; set; }
-    public string SourceName { get; set; } = string.Empty;
-    public int SourceId { get; set; }
-    public string Year { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
-    public string DetailUrl { get; set; } = string.Empty;
-}
-
-public class MovieDetailResult
-{
-    public string Id { get; set; } = string.Empty;
-    public string Title { get; set; } = string.Empty;
-    public string PosterUrl { get; set; } = string.Empty;
-    public double Rating { get; set; }
-    public string Description { get; set; } = string.Empty;
-    public string Year { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
-    public List<EpisodeResult> Episodes { get; set; } = new();
-}
-
-public class EpisodeResult
-{
-    public string Name { get; set; } = string.Empty;
-    public string PlayUrl { get; set; } = string.Empty;
-    public int Index { get; set; }
+    public bool Autoplay { get; set; }
+    public int Timeout { get; set; } = 15000; // 播放器加载超时时间
+    public bool FilterAds { get; set; } = true; // 是否启用广告过滤
+    public bool AutoPlayNext { get; set; } = true; // 默认启用自动连播功能
+    public bool AdFilteringEnabled { get; set; } = true; // 默认开启分片广告过滤
+    public bool DoubanApiEnabled { get; set; } // 豆瓣API
+    public bool HomeAutoLoadDoubanEnabled { get; set; } // 首页自动加载豆瓣数据
+    public bool ForceApiNeedSpecialSource { get; set; } //强制使用api
 }

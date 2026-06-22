@@ -5,7 +5,7 @@
     x:Class="Lunadroid.App.Views.HomePage"
     x:DataType="viewmodel:HomeViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:models="clr-namespace:Lunadroid.Core.Models;assembly=Lunadroid.Core"
+    xmlns:models1="clr-namespace:Lunadroid.App.Models"
     xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
     xmlns:viewmodel="clr-namespace:Lunadroid.App.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
@@ -91,10 +91,10 @@
                 Wrap="Wrap"
                 x:Name="SearchHistoryLayout">
                 <BindableLayout.ItemsSource>
-                    <Binding Path="SearchHistories" />
+                    <Binding Path="SearchResults" />
                 </BindableLayout.ItemsSource>
                 <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="models:SearchHistory">
+                    <DataTemplate x:DataType="models1:VedioSearchResult">
                         <Border
                             BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
                                                               Dark={StaticResource Gray800}}"
@@ -138,7 +138,7 @@
             ItemsSource="{Binding SearchResults}"
             Margin="8,4">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:MovieSearchResult">
+                <DataTemplate x:DataType="models1:VedioSearchResult">
                     <Border
                         BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
                                                           Dark={StaticResource Gray900}}"

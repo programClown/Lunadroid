@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Refit.HttpClientFactory" Version="11.2.0"/>
         <PackageReference Include="sqlite-net-pcl" Version="1.11.272-beta"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageReference Include="Serilog" Version="4.3.1"/>

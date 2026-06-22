@@ -1,4 +1,5 @@
 ﻿using Lunadroid.App.Views;
+using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
 using Environment = Android.OS.Environment;
 
@@ -26,8 +27,25 @@ public partial class App : Application
             // Initialize logging
             var publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
             var logDir = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "logs");
-            LoggingService.Initialize(logDir);
-            LoggingService.Info("App starting...");
+            Logger.Initialize(logDir);
+            Logger.Info("App starting...");
+
+            var appSources = new List<ApiSource>
+            {
+                new()
+                {
+                    Id = 0,
+                    Source = "www.moduzy.net",
+                    Name = "🎬魔都资源",
+                    ApiBaseUrl = "https://www.mdzyapi.com/api.php/provide/vod",
+                    DetailBaseUrl = "https://www.moduzy.net",
+                    IsCustomApi = false,
+                    IsAdult = false,
+                    IsEnabled = true,
+                    CreateTime = DateTime.Now
+                }
+            };
+            AppSettings.UpdateSites(appSources);
 
             // Initialize database synchronously-fast (CreateTableAsync is ~20ms per table)
             await databaseService.InitializeAsync();
@@ -35,7 +53,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            LoggingService.Error("App initialization failed", ex);
+            Logger.Error("App initialization failed", ex);
             _dbReady.TrySetException(ex);
         }
     }

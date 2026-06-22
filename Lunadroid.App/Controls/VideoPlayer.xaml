@@ -116,6 +116,7 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
                     Grid.Row="1"
+                    HorizontalOptions="Center"
                     Margin="0,6,0,0"
                     Spacing="16">
 

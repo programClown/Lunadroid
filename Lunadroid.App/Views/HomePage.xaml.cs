@@ -14,10 +14,5 @@ public partial class HomePage : UraniumContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
-        if (BindingContext is HomeViewModel vm)
-        {
-            await vm.InitializeAsync();
-        }
     }
 }
