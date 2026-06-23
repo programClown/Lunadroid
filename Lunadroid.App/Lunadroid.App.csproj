@@ -26,6 +26,14 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+        <AndroidKeyStore>true</AndroidKeyStore>
+        <AndroidSigningKeyStore>lunadroid.keystore</AndroidSigningKeyStore>
+        <AndroidSigningKeyAlias>lunadroid</AndroidSigningKeyAlias>
+        <AndroidSigningKeyPass>lunadroid123</AndroidSigningKeyPass>
+        <AndroidSigningStorePass>lunadroid123</AndroidSigningStorePass>
+    </PropertyGroup>
+
     <ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#06B6D4"/>

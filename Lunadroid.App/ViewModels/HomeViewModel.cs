@@ -1,9 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lunadroid.App.Models;
 using Lunadroid.App.Services;
 using Lunadroid.Core.Services;
+using System.Collections.ObjectModel;
 
 namespace Lunadroid.App.ViewModels;
 
@@ -40,7 +40,7 @@ public partial class HomeViewModel : BaseViewModel
             return;
         }
 
-        var keyword = SearchText.Trim();
+        string keyword = SearchText.Trim();
 
         SearchResults.Clear();
         HasSearchResults = false;
@@ -50,14 +50,18 @@ public partial class HomeViewModel : BaseViewModel
 
         _searchCts?.Cancel();
         _searchCts = new CancellationTokenSource();
-        var token = _searchCts.Token;
+        CancellationToken token = _searchCts.Token;
 
         try
         {
-            foreach (var api in AppSettings.SelectApis)
+            foreach (string api in AppSettings.SelectApis)
             {
                 var ones = await _movieTvService.Search(api, keyword);
-                ones.ForEach(x => SearchResults.Add(x));
+                // ones.ForEach(x => SearchResults.Add(x));
+                foreach (VedioSearchResult vedioSearchResult in ones)
+                {
+                    SearchResults.Add(vedioSearchResult);
+                }
 
                 if (SearchResults.Count >= AppSettings.SearchMaxVideos) break;
             }
@@ -69,10 +73,10 @@ public partial class HomeViewModel : BaseViewModel
                 IsSearchOngoing = false;
                 return;
             }
-
             SearchStatusText = SearchResults.Count > 0
                 ? $"搜索完成，共找到 {SearchResults.Count} 个结果"
                 : "未找到相关影视资源";
+            HasSearchResults = true;
         }
         catch (OperationCanceledException)
         {
@@ -96,7 +100,7 @@ public partial class HomeViewModel : BaseViewModel
     {
         try
         {
-            var result = await FilePicker.Default.PickAsync(new PickOptions
+            FileResult? result = await FilePicker.Default.PickAsync(new PickOptions
             {
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
@@ -124,9 +128,8 @@ public partial class HomeViewModel : BaseViewModel
     {
         if (movie == null) return;
 
-        // var episodesParam = Uri.EscapeDataString(JsonSerializer.Serialize(detail.Episodes));
-        // await Shell.Current.GoToAsync(
-        //     $"moviedetail?movieId={Uri.EscapeDataString(movie.Id)}&title={Uri.EscapeDataString(movie.Title)}&poster={Uri.EscapeDataString(movie.PosterUrl)}&rating={movie.Rating}&sourceName={Uri.EscapeDataString(movie.SourceName)}&episodes={episodesParam}");
+        await Shell.Current.GoToAsync(
+            $"PlayerPage?source={Uri.EscapeDataString(movie.Source)}&vodId={Uri.EscapeDataString(movie.Id)}");
     }
 
     [RelayCommand]

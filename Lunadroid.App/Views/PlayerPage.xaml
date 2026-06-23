@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<uranium:UraniumContentPage
+    x:Class="Lunadroid.App.Views.PlayerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Lunadroid.App.Controls"
+    xmlns:material="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+    xmlns:models="clr-namespace:Lunadroid.App.Models"
+    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
+    Title="播放"
+    x:DataType="vm:PlayerViewModel">
+
+    <Grid ColumnDefinitions="3*,2*" RowDefinitions="*">
+
+        <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            BackgroundColor="Black"
+            StrokeShape="Rectangle">
+            <controls:VideoPlayer
+                ShouldAutoPlay="True"
+                Source="{Binding VideoUrl}"
+                VideoTitle="{Binding Title}" />
+        </Border>
+
+        <Grid
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="12,8"
+            RowDefinitions="Auto,*">
+
+            <ScrollView Grid.Row="0" Margin="0,0,0,8">
+                <VerticalStackLayout Spacing="8">
+
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        LineBreakMode="WordWrap"
+                        Text="{Binding Title}"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                    Dark={StaticResource White}}" />
+
+                    <HorizontalStackLayout Spacing="8">
+                        <Border
+                            Padding="6,2"
+                            BackgroundColor="{StaticResource PrimaryContainer}"
+                            StrokeShape="RoundRectangle 4">
+                            <Label
+                                FontSize="12"
+                                Text="{Binding Type}"
+                                TextColor="{StaticResource OnPrimaryContainer}" />
+                        </Border>
+
+                        <Border
+                            Padding="6,2"
+                            BackgroundColor="{StaticResource SecondaryContainer}"
+                            StrokeShape="RoundRectangle 4">
+                            <Label
+                                FontSize="12"
+                                Text="{Binding Area}"
+                                TextColor="{StaticResource OnSecondaryContainer}" />
+                        </Border>
+
+                        <Border
+                            Padding="6,2"
+                            BackgroundColor="{StaticResource TertiaryContainer}"
+                            StrokeShape="RoundRectangle 4">
+                            <Label
+                                FontSize="12"
+                                Text="{Binding Year}"
+                                TextColor="{StaticResource OnTertiaryContainer}" />
+                        </Border>
+
+                        <Border
+                            Padding="6,2"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
+                                                              Dark={StaticResource Gray800}}"
+                            StrokeShape="RoundRectangle 4">
+                            <Label
+                                FontSize="12"
+                                Text="{Binding SourceName}"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                            Dark={StaticResource Gray300}}" />
+                        </Border>
+                    </HorizontalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <HorizontalStackLayout Spacing="4">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="13"
+                                Text="导演:"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                            Dark={StaticResource Gray400}}" />
+                            <Label
+                                FontSize="13"
+                                LineBreakMode="TailTruncation"
+                                Text="{Binding Director}"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                            Dark={StaticResource Gray200}}" />
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout Spacing="4">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="13"
+                                Text="演员:"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                            Dark={StaticResource Gray400}}" />
+                            <Label
+                                FontSize="13"
+                                LineBreakMode="TailTruncation"
+                                MaxLines="2"
+                                Text="{Binding Actor}"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                            Dark={StaticResource Gray200}}" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                    <Label
+                        FontSize="13"
+                        LineBreakMode="WordWrap"
+                        MaxLines="4"
+                        Text="{Binding Desc}"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                    Dark={StaticResource Gray400}}" />
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <Grid Grid.Row="1" RowDefinitions="Auto,*">
+                <Label
+                    Grid.Row="0"
+                    Margin="0,0,0,6"
+                    FontAttributes="Bold"
+                    FontSize="15"
+                    Text="剧集"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource White}}" />
+
+                <CollectionView
+                    Grid.Row="1"
+                    ItemSizingStrategy="MeasureFirstItem"
+                    ItemsSource="{Binding Episodes}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:EpisodeSubject">
+                            <Border
+                                Margin="0,3"
+                                Padding="12,8"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                                  Dark={StaticResource Gray900}}"
+                                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                                         Dark={StaticResource Gray700}}"
+                                StrokeShape="RoundRectangle 8">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=SelectEpisodeCommand}" CommandParameter="{Binding}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                    <ImageButton
+                                        Grid.Column="0"
+                                        BackgroundColor="Transparent"
+                                        HeightRequest="28"
+                                        Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                 Glyph={x:Static material:MaterialOutlined.Play_circle},
+                                                                 Size=22,
+                                                                 Color={StaticResource Primary}}"
+                                        VerticalOptions="Center"
+                                        WidthRequest="28" />
+                                    <Label
+                                        Grid.Column="1"
+                                        FontSize="14"
+                                        Text="{Binding Name}"
+                                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                    Dark={StaticResource White}}"
+                                        VerticalOptions="Center" />
+                                </Grid>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal" />
+                                            <VisualState x:Name="PointerOver">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource PrimaryContainer}, Dark={StaticResource Gray800}}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+
+</uranium:UraniumContentPage>

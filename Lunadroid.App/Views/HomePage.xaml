@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <uranium:UraniumContentPage
-    Title="首页"
     x:Class="Lunadroid.App.Views.HomePage"
-    x:DataType="viewmodel:HomeViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:models1="clr-namespace:Lunadroid.App.Models"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:Lunadroid.App.Models"
     xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
-    xmlns:viewmodel="clr-namespace:Lunadroid.App.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
+    Title="首页"
+    x:DataType="vm:HomeViewModel">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
 
         <!--  Search Bar  -->
         <SearchBar
             Grid.Row="0"
-            HeightRequest="48"
             Margin="12,8"
+            HeightRequest="48"
             Placeholder="搜索影视资源..."
             SearchCommand="{Binding SearchCommand}"
             Text="{Binding SearchText}" />
@@ -24,16 +24,15 @@
         <!--  Search Status & Stop Button  -->
         <HorizontalStackLayout
             Grid.Row="1"
-            HorizontalOptions="Fill"
-            IsVisible="{Binding IsSearchOngoing}"
             Margin="16,0,16,4"
+            HorizontalOptions="Fill"
             Spacing="12">
             <ActivityIndicator
-                Color="{StaticResource Primary}"
                 HeightRequest="20"
                 IsRunning="{Binding IsSearchOngoing}"
                 VerticalOptions="Center"
-                WidthRequest="20" />
+                WidthRequest="20"
+                Color="{StaticResource Primary}" />
             <Label
                 FontSize="13"
                 LineBreakMode="TailTruncation"
@@ -42,114 +41,38 @@
                                             Dark={StaticResource Gray400}}"
                 VerticalOptions="Center" />
             <Button
+                Padding="8,2"
                 BackgroundColor="{StaticResource Error}"
                 Command="{Binding StopSearchCommand}"
                 FontSize="12"
                 HeightRequest="32"
-                Padding="8,2"
+                IsVisible="{Binding IsSearchOngoing}"
                 Text="停止搜索"
                 TextColor="White"
                 VerticalOptions="Center" />
         </HorizontalStackLayout>
 
-        <!--  Search Result Status (when search completed)  -->
-        <Label
-            FontSize="13"
-            Grid.Row="1"
-            IsVisible="{Binding IsSearchOngoing}"
-            Margin="16,4"
-            Text="{Binding SearchStatusText}"
-            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
-                                        Dark={StaticResource Gray400}}" />
-
-        <!--  Search History Panel  -->
-        <VerticalStackLayout
-            Grid.Row="2"
-            IsVisible="{Binding ShowSearchHistory}"
-            Margin="16,4">
-            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="14"
-                    Text="搜索历史"
-                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
-                                                Dark={StaticResource White}}"
-                    VerticalOptions="Center" />
-                <Button
-                    BackgroundColor="Transparent"
-                    Command="{Binding ClearSearchHistoriesCommand}"
-                    FontSize="12"
-                    HeightRequest="28"
-                    Padding="8,2"
-                    Text="清除全部"
-                    TextColor="{StaticResource Primary}" />
-            </Grid>
-
-            <FlexLayout
-                AlignItems="Start"
-                JustifyContent="Start"
-                Wrap="Wrap"
-                x:Name="SearchHistoryLayout">
-                <BindableLayout.ItemsSource>
-                    <Binding Path="SearchResults" />
-                </BindableLayout.ItemsSource>
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="models1:VedioSearchResult">
-                        <Border
-                            BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
-                                                              Dark={StaticResource Gray800}}"
-                            Margin="0,0,8,8"
-                            Padding="10,6"
-                            Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
-                                                     Dark={StaticResource Gray700}}"
-                            StrokeShape="RoundRectangle 16">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=SearchFromHistoryCommand}" CommandParameter="{Binding Keyword}" />
-                            </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                                <Label
-                                    FontSize="13"
-                                    Grid.Column="0"
-                                    Text="{Binding Keyword}"
-                                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
-                                                                Dark={StaticResource Gray300}}"
-                                    VerticalOptions="Center" />
-                                <ImageButton
-                                    BackgroundColor="Transparent"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=DeleteSearchHistoryCommand}"
-                                    CommandParameter="{Binding}"
-                                    Grid.Column="1"
-                                    HeightRequest="16"
-                                    Source="close.png"
-                                    WidthRequest="16" />
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </FlexLayout>
-        </VerticalStackLayout>
-
         <!--  Movie Cards Grid  -->
         <CollectionView
-            Grid.Row="3"
+            Grid.Row="2"
+            Margin="8,4"
             IsVisible="{Binding HasSearchResults}"
             ItemSizingStrategy="MeasureFirstItem"
             ItemsLayout="VerticalGrid, 3"
-            ItemsSource="{Binding SearchResults}"
-            Margin="8,4">
+            ItemsSource="{Binding SearchResults}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models1:VedioSearchResult">
+                <DataTemplate x:DataType="models:VedioSearchResult">
                     <Border
+                        Margin="6,4"
+                        Padding="0"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
                                                           Dark={StaticResource Gray900}}"
-                        Margin="6,4"
                         MaximumWidthRequest="200"
-                        Padding="0"
                         Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
-                                                 Dark={StaticResource Gray700}}"
+                                                 Dark={StaticResource Gray600}}"
                         StrokeShape="RoundRectangle 12">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=MovieTappedCommand}" CommandParameter="{Binding}" />
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=MovieTappedCommand}" CommandParameter="{Binding}" />
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="0">
                             <!--  Poster Image  -->
@@ -158,29 +81,12 @@
                                 HeightRequest="180"
                                 HorizontalOptions="Fill"
                                 MinimumWidthRequest="100"
-                                Source="{Binding PosterUrl}"
+                                Source="{Binding Cover}"
                                 WidthRequest="200">
                                 <Image.IsVisible>
-                                    <Binding Converter="{StaticResource StringIsNotNullOrEmptyConverter}" Path="PosterUrl" />
+                                    <Binding Converter="{StaticResource StringIsNotNullOrEmptyConverter}" Path="Cover" />
                                 </Image.IsVisible>
                             </Image>
-
-                            <!--  Placeholder when no poster  -->
-                            <Border
-                                BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
-                                                                  Dark={StaticResource Gray800}}"
-                                HeightRequest="180"
-                                HorizontalOptions="Fill"
-                                WidthRequest="200">
-                                <Border.IsVisible>
-                                    <Binding Converter="{StaticResource StringIsNotNullOrEmptyConverter}" Path="PosterUrl" />
-                                </Border.IsVisible>
-                                <Label
-                                    FontSize="40"
-                                    HorizontalOptions="Center"
-                                    Text="🎬"
-                                    VerticalOptions="Center" />
-                            </Border>
 
                             <!--  Movie Info  -->
                             <VerticalStackLayout Padding="8,6" Spacing="3">
@@ -188,36 +94,9 @@
                                     FontAttributes="Bold"
                                     FontSize="13"
                                     LineBreakMode="TailTruncation"
-                                    Text="{Binding Title}"
+                                    Text="{Binding Name}"
                                     TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                                 Dark={StaticResource White}}" />
-
-                                <HorizontalStackLayout Spacing="6">
-                                    <!--  Rating  -->
-                                    <HorizontalStackLayout Spacing="2">
-                                        <Label
-                                            FontSize="11"
-                                            Text="⭐"
-                                            VerticalOptions="Center" />
-                                        <Label
-                                            FontSize="11"
-                                            Text="{Binding Rating, StringFormat='{0:F1}'}"
-                                            TextColor="{StaticResource Primary}"
-                                            VerticalOptions="Center" />
-                                    </HorizontalStackLayout>
-
-                                    <!--  Source Name  -->
-                                    <Border
-                                        BackgroundColor="{StaticResource PrimaryContainer}"
-                                        HorizontalOptions="Start"
-                                        Padding="4,1"
-                                        StrokeShape="RoundRectangle 4">
-                                        <Label
-                                            FontSize="10"
-                                            Text="{Binding SourceName}"
-                                            TextColor="{StaticResource OnPrimaryContainer}" />
-                                    </Border>
-                                </HorizontalStackLayout>
 
                                 <!--  Year & Category  -->
                                 <Label
@@ -228,7 +107,7 @@
                                     <Label.Text>
                                         <MultiBinding StringFormat="{}{0} · {1}">
                                             <Binding Path="Year" />
-                                            <Binding Path="Category" />
+                                            <Binding Path="Tag" />
                                         </MultiBinding>
                                     </Label.Text>
                                 </Label>
@@ -253,10 +132,10 @@
 
         <!--  Empty State  -->
         <VerticalStackLayout
-            Grid.Row="3"
-            HorizontalOptions="Center"
-            IsVisible="{Binding HasSearchResults}"
+            Grid.Row="2"
             Margin="0,60,0,0"
+            HorizontalOptions="Center"
+            IsVisible="{Binding HasSearchResults, Converter={StaticResource InvertedBoolConverter}}"
             Spacing="12"
             VerticalOptions="Center">
             <Label

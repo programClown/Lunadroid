@@ -6,9 +6,9 @@ public class ApiSource
 {
     [PrimaryKey] [AutoIncrement] public int Id { get; set; }
 
-    public string? Source { get; set; }
-    public string? Name { get; set; }
-    public string? ApiBaseUrl { get; set; }
+    public string Source { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string ApiBaseUrl { get; set; } = string.Empty;
     public string? DetailBaseUrl { get; set; }
     public bool IsAdult { get; set; }
     public bool IsCustomApi { get; set; }

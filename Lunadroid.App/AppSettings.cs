@@ -24,15 +24,15 @@ public static class AppSettings
     public static readonly List<string> SelectApis = ["dyttzy", "tyyszy"];
     public static readonly List<string> SelectAdultApis = [];
 
-    public static Dictionary<string, ApiSourceInfo> ApiSitesConfig = new();
-    public static Dictionary<string, ApiSourceInfo> AdultApiSitesConfig = new();
+    public static readonly Dictionary<string, ApiSourceInfo> ApiSitesConfig = new();
+    public static readonly Dictionary<string, ApiSourceInfo> AdultApiSitesConfig = new();
 
     public static void UpdateSites(List<ApiSource> apiSources)
     {
         ApiSitesConfig.Clear();
         AdultApiSitesConfig.Clear();
 
-        foreach (var apiSource in apiSources)
+        foreach (ApiSource apiSource in apiSources)
         {
             if (apiSource.IsAdult)
             {
@@ -54,5 +54,10 @@ public static class AppSettings
                 ));
             }
         }
+        SelectApis.Clear();
+        SelectAdultApis.Clear();
+
+        SelectApis.AddRange(ApiSitesConfig.Select(apiSourceInfo => apiSourceInfo.Key));
+        SelectAdultApis.AddRange(AdultApiSitesConfig.Select(apiSourceInfo => apiSourceInfo.Key));
     }
 }
