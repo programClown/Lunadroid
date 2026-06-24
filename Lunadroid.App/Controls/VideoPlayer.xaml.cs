@@ -1,4 +1,4 @@
-﻿using Android.Content.PM;
+﻿﻿using Android.Content.PM;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Views;
 using UraniumUI.Icons.MaterialSymbols;
@@ -26,7 +26,7 @@ public partial class VideoPlayer : ContentView
         { FontFamily = "MaterialOutlined", Glyph = MaterialOutlined.Volume_off, Size = 22, Color = Colors.White };
 
     public static readonly BindableProperty SourceProperty =
-        BindableProperty.Create(nameof(Source), typeof(MediaSource), typeof(VideoPlayer),
+        BindableProperty.Create(nameof(Source), typeof(string), typeof(VideoPlayer), null,
             propertyChanged: OnSourceChanged);
 
     public static readonly BindableProperty VideoTitleProperty =
@@ -49,9 +49,9 @@ public partial class VideoPlayer : ContentView
         VolumeSlider.Value = 1.0;
     }
 
-    public MediaSource? Source
+    public string? Source
     {
-        get => (MediaSource?)GetValue(SourceProperty);
+        get => (string?)GetValue(SourceProperty);
         set => SetValue(SourceProperty, value);
     }
 
@@ -67,10 +67,22 @@ public partial class VideoPlayer : ContentView
         set => SetValue(ShouldAutoPlayProperty, value);
     }
 
+    public bool IsFullscreen { get; private set; }
+
     private static void OnSourceChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var player = (VideoPlayer)bindable;
-        player.MediaPlayer.Source = (MediaSource?)newValue;
+        var url = (string?)newValue;
+
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            player.MediaPlayer.Stop();
+            player.MediaPlayer.Source = null;
+            return;
+        }
+
+        player.MediaPlayer.Source = MediaSource.FromUri(url);
+
         if (player.ShouldAutoPlay)
         {
             player.MediaPlayer.Play();
@@ -234,20 +246,29 @@ public partial class VideoPlayer : ContentView
         SpeedButton.Text = $"{speed}x";
     }
 
+    public void ExitFullscreen()
+    {
+        if (!IsFullscreen) return;
+        var activity = Platform.CurrentActivity;
+        if (activity == null) return;
+        activity.RequestedOrientation = ScreenOrientation.Portrait;
+        IsFullscreen = false;
+    }
+
     private void OnFullscreenClicked(object? sender, EventArgs e)
     {
         var activity = Platform.CurrentActivity;
         if (activity == null) return;
 
-        var currentOrientation = activity.RequestedOrientation;
-        if (currentOrientation == ScreenOrientation.Landscape ||
-            currentOrientation == ScreenOrientation.ReverseLandscape)
+        if (IsFullscreen)
         {
             activity.RequestedOrientation = ScreenOrientation.Portrait;
+            IsFullscreen = false;
         }
         else
         {
             activity.RequestedOrientation = ScreenOrientation.Landscape;
+            IsFullscreen = true;
         }
     }
 

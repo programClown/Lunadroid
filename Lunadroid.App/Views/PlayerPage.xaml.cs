@@ -26,4 +26,15 @@ public partial class PlayerPage : UraniumContentPage, IQueryAttributable
             vm.SetLocalVideoAsync(playUrl).FireAndForget();
         }
     }
+
+    protected override bool OnBackButtonPressed()
+    {
+        if (VideoPlayer.IsFullscreen)
+        {
+            VideoPlayer.ExitFullscreen();
+            return true;
+        }
+
+        return base.OnBackButtonPressed();
+    }
 }

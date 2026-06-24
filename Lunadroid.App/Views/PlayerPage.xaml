@@ -7,21 +7,20 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:controls="clr-namespace:Lunadroid.App.Controls"
     xmlns:material="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
     xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Grid RowDefinitions="300,Auto">
+    <Grid RowDefinitions="Auto,*">
 
-        <Border
-            BackgroundColor="Black"
+        <controls:VideoPlayer
             Grid.Row="0"
-            StrokeShape="Rectangle">
-            <controls:VideoPlayer
-                ShouldAutoPlay="True"
-                Source="{Binding VideoUrl}"
-                VideoTitle="{Binding Title}" />
-        </Border>
+            HeightRequest="240"
+            HorizontalOptions="Fill"
+            ShouldAutoPlay="True"
+            Source="{Binding VideoUrl}"
+            VideoTitle="{Binding Title}"
+            x:Name="VideoPlayer" />
 
         <Grid
             Grid.Row="1"
@@ -86,7 +85,7 @@
                         <HorizontalStackLayout Spacing="4">
                             <Label
                                 FontAttributes="Bold"
-                                FontSize="13"
+                                FontSize="15"
                                 Text="导演:"
                                 TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
                                                             Dark={StaticResource Gray400}}" />
@@ -101,27 +100,33 @@
                         <HorizontalStackLayout Spacing="4">
                             <Label
                                 FontAttributes="Bold"
-                                FontSize="13"
+                                FontSize="15"
                                 Text="演员:"
                                 TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
                                                             Dark={StaticResource Gray400}}" />
                             <Label
                                 FontSize="13"
                                 LineBreakMode="TailTruncation"
-                                MaxLines="2"
+                                MaxLines="1"
                                 Text="{Binding VideoDetail.Actor}"
                                 TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                             Dark={StaticResource Gray200}}" />
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
 
-                    <Label
-                        FontSize="13"
-                        LineBreakMode="WordWrap"
-                        MaxLines="4"
-                        Text="{Binding VideoDetail.Desc}"
-                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
-                                                    Dark={StaticResource Gray400}}" />
+                    <uranium:ExpanderView>
+                        <uranium:ExpanderView.Header>
+                            <Label Text="剧情" />
+                        </uranium:ExpanderView.Header>
+                        <Label
+                            FontSize="13"
+                            LineBreakMode="WordWrap"
+                            Text="{Binding VideoDetail.Desc}"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                        Dark={StaticResource Gray400}}" />
+                    </uranium:ExpanderView>
+
+
                 </VerticalStackLayout>
             </ScrollView>
 
@@ -157,10 +162,9 @@
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=SelectEpisodeCommand}" CommandParameter="{Binding}" />
                                     </Border.GestureRecognizers>
-                                    <Grid RowDefinitions="Auto,Auto" RowSpacing="2">
+                                    <HorizontalStackLayout Spacing="2">
                                         <ImageButton
                                             BackgroundColor="Transparent"
-                                            Grid.Row="0"
                                             HeightRequest="24"
                                             HorizontalOptions="Center"
                                             Source="{FontImageSource FontFamily=MaterialOutlined,
@@ -170,14 +174,15 @@
                                             WidthRequest="24" />
                                         <Label
                                             FontSize="12"
-                                            Grid.Row="1"
                                             HorizontalOptions="Center"
                                             HorizontalTextAlignment="Center"
                                             LineBreakMode="TailTruncation"
                                             Text="{Binding Name}"
                                             TextColor="{AppThemeBinding Light={StaticResource OnSurface},
-                                                                        Dark={StaticResource White}}" />
-                                    </Grid>
+                                                                        Dark={StaticResource White}}"
+                                            VerticalOptions="Center"
+                                            VerticalTextAlignment="Center" />
+                                    </HorizontalStackLayout>
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroupList>
                                             <VisualStateGroup x:Name="CommonStates">

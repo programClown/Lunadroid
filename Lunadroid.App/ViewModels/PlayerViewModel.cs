@@ -16,7 +16,7 @@ public partial class PlayerViewModel : BaseViewModel
     [ObservableProperty] private string _episodesCountText;
     [ObservableProperty] private EpisodeSubjectItem? _selectedEpisode;
     [ObservableProperty] private DetailResult? _videoDetail;
-    [ObservableProperty] private string _videoUrl;
+    [ObservableProperty] private string _videoUrl = "https://vod.360zyx.vip/20250708/7T2xjBRd/index.m3u8";
 
     public PlayerViewModel(MovieTvService movieTvService, DatabaseService databaseService)
     {
@@ -86,7 +86,7 @@ public partial class PlayerViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void SelectEpisode(EpisodeSubjectItem? episode)
+    private async Task SelectEpisodeAsync(EpisodeSubjectItem? episode)
     {
         if (episode == null) return;
         SelectedEpisode = episode;
