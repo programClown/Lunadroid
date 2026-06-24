@@ -1,4 +1,4 @@
-﻿﻿using Android.Content.PM;
+﻿using Android.Content.PM;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Views;
 using UraniumUI.Icons.MaterialSymbols;
@@ -26,7 +26,7 @@ public partial class VideoPlayer : ContentView
         { FontFamily = "MaterialOutlined", Glyph = MaterialOutlined.Volume_off, Size = 22, Color = Colors.White };
 
     public static readonly BindableProperty SourceProperty =
-        BindableProperty.Create(nameof(Source), typeof(string), typeof(VideoPlayer), null,
+        BindableProperty.Create(nameof(Source), typeof(string), typeof(VideoPlayer),
             propertyChanged: OnSourceChanged);
 
     public static readonly BindableProperty VideoTitleProperty =
