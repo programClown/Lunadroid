@@ -2,74 +2,76 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lunadroid.App.Models;
 using Lunadroid.App.Services;
-using System.Collections.ObjectModel;
+using Lunadroid.Core.Services;
 
 namespace Lunadroid.App.ViewModels;
 
 public partial class PlayerViewModel : BaseViewModel
 {
+    private readonly DatabaseService _databaseService;
     private readonly MovieTvService _movieTvService;
 
-    [ObservableProperty] private string _actor = string.Empty;
+    [ObservableProperty] private List<EpisodeSubjectItem> _episodes = new();
 
-    [ObservableProperty] private string _area = string.Empty;
+    [ObservableProperty] private string _episodesCountText;
+    [ObservableProperty] private EpisodeSubjectItem? _selectedEpisode;
+    [ObservableProperty] private DetailResult? _videoDetail;
+    [ObservableProperty] private string _videoUrl;
 
-    [ObservableProperty] private string _cover = string.Empty;
-
-    [ObservableProperty] private string _desc = string.Empty;
-
-    [ObservableProperty] private string _director = string.Empty;
-
-    [ObservableProperty] private EpisodeSubject? _selectedEpisode;
-
-    [ObservableProperty] private string _sourceName = string.Empty;
-
-    [ObservableProperty] private string _title = string.Empty;
-
-    [ObservableProperty] private string _type = string.Empty;
-
-    [ObservableProperty] private string _videoUrl = string.Empty;
-
-    [ObservableProperty] private string _year = string.Empty;
-
-    public PlayerViewModel(MovieTvService movieTvService)
+    public PlayerViewModel(MovieTvService movieTvService, DatabaseService databaseService)
     {
         _movieTvService = movieTvService;
+        _databaseService = databaseService;
     }
 
-    public ObservableCollection<EpisodeSubject> Episodes { get; } = [];
+    public async Task SetOnLineVideoAsync(VedioSearchResult? videoSearchResult)
+    {
+        if (videoSearchResult == null) return;
+        await LoadDetailAsync(videoSearchResult.Source, videoSearchResult.Id);
+    }
 
-    public async Task LoadDetailAsync(string source, string vodId, bool isAdult = false)
+    public async Task SetLocalVideoAsync(string? playUrl)
+    {
+        if (playUrl == null) return;
+        await LoadDetailAsync(playUrl, null);
+    }
+
+    public async Task LoadDetailAsync(string source, string? vodId)
     {
         if (IsBusy) return;
         IsBusy = true;
 
         try
         {
-            DetailResult? detail = await _movieTvService.SearchDetail(source, vodId, isAdult);
-            if (detail == null) return;
+            if (vodId is null)
+            {
+                // 本地视频
+                return;
+            }
 
-            Title = detail.Title ?? string.Empty;
-            Cover = detail.Cover ?? string.Empty;
-            Desc = detail.Desc ?? string.Empty;
-            Type = detail.Type ?? string.Empty;
-            Year = detail.Year ?? string.Empty;
-            Area = detail.Area ?? string.Empty;
-            Director = detail.Director ?? string.Empty;
-            Actor = detail.Actor ?? string.Empty;
-            SourceName = detail.SourceName ?? string.Empty;
+            VideoDetail = await _movieTvService.SearchDetail(source, vodId);
+            if (VideoDetail == null) return;
 
             Episodes.Clear();
-            if (detail.Episodes is { Count: > 0 })
+            if (VideoDetail.Episodes != null)
             {
-                foreach (EpisodeSubject ep in detail.Episodes)
+                Episodes = VideoDetail.Episodes.Select(ep => new EpisodeSubjectItem
                 {
-                    Episodes.Add(ep);
-                }
-
-                SelectedEpisode = Episodes[0];
-                VideoUrl = Episodes[0].Url ?? string.Empty;
+                    Watched = false,
+                    Name = ep.Name,
+                    Url = ep.Url,
+                    IsSelected = true // 默认全部选中
+                }).ToList();
             }
+
+            EpisodesCountText = $"共{Episodes.Count}集";
+            // var viewHistory = _viewHistoryTable.GetSingle(his =>
+            //     his.VodId == VideoDetail.VodId && his.Source == SourceName && his.Name == VideoName);
+            // if (viewHistory is not null)
+            // {
+            //     Episodes[Episodes.IndexOf(Episodes.FirstOrDefault(ep => ep.Name == viewHistory.Episode))].Watched =
+            //         true;
+            // }
         }
         finally
         {
@@ -84,10 +86,18 @@ public partial class PlayerViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void SelectEpisode(EpisodeSubject? episode)
+    private void SelectEpisode(EpisodeSubjectItem? episode)
     {
         if (episode == null) return;
         SelectedEpisode = episode;
         VideoUrl = episode.Url ?? string.Empty;
     }
+}
+
+public partial class EpisodeSubjectItem : ObservableObject
+{
+    [ObservableProperty] private bool _isSelected;
+    [ObservableProperty] private string? _name;
+    [ObservableProperty] private string? _url;
+    [ObservableProperty] private bool _watched; //是否观看
 }

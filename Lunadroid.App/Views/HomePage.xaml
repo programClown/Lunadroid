@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <uranium:UraniumContentPage
+    Title="首页"
     x:Class="Lunadroid.App.Views.HomePage"
+    x:DataType="vm:HomeViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:Lunadroid.App.Models"
     xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
     xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
-    Title="首页"
-    x:DataType="vm:HomeViewModel">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <Grid RowDefinitions="Auto,Auto,*">
 
         <!--  Search Bar  -->
         <SearchBar
             Grid.Row="0"
-            Margin="12,8"
             HeightRequest="48"
+            Margin="12,8"
             Placeholder="搜索影视资源..."
             SearchCommand="{Binding SearchCommand}"
             Text="{Binding SearchText}" />
@@ -24,15 +24,15 @@
         <!--  Search Status & Stop Button  -->
         <HorizontalStackLayout
             Grid.Row="1"
-            Margin="16,0,16,4"
             HorizontalOptions="Fill"
+            Margin="16,0,16,4"
             Spacing="12">
             <ActivityIndicator
+                Color="{StaticResource Primary}"
                 HeightRequest="20"
                 IsRunning="{Binding IsSearchOngoing}"
                 VerticalOptions="Center"
-                WidthRequest="20"
-                Color="{StaticResource Primary}" />
+                WidthRequest="20" />
             <Label
                 FontSize="13"
                 LineBreakMode="TailTruncation"
@@ -41,12 +41,12 @@
                                             Dark={StaticResource Gray400}}"
                 VerticalOptions="Center" />
             <Button
-                Padding="8,2"
                 BackgroundColor="{StaticResource Error}"
                 Command="{Binding StopSearchCommand}"
                 FontSize="12"
                 HeightRequest="32"
                 IsVisible="{Binding IsSearchOngoing}"
+                Padding="8,2"
                 Text="停止搜索"
                 TextColor="White"
                 VerticalOptions="Center" />
@@ -55,19 +55,19 @@
         <!--  Movie Cards Grid  -->
         <CollectionView
             Grid.Row="2"
-            Margin="8,4"
             IsVisible="{Binding HasSearchResults}"
             ItemSizingStrategy="MeasureFirstItem"
             ItemsLayout="VerticalGrid, 3"
-            ItemsSource="{Binding SearchResults}">
+            ItemsSource="{Binding SearchResults}"
+            Margin="8,4">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:VedioSearchResult">
                     <Border
-                        Margin="6,4"
-                        Padding="0"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
                                                           Dark={StaticResource Gray900}}"
+                        Margin="6,4"
                         MaximumWidthRequest="200"
+                        Padding="0"
                         Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
                                                  Dark={StaticResource Gray600}}"
                         StrokeShape="RoundRectangle 12">
@@ -97,7 +97,12 @@
                                     Text="{Binding Name}"
                                     TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                                 Dark={StaticResource White}}" />
-
+                                <Label
+                                    FontSize="13"
+                                    LineBreakMode="TailTruncation"
+                                    Text="{Binding SourceName}"
+                                    TextColor="{AppThemeBinding Light={StaticResource Secondary},
+                                                                Dark={StaticResource White}}" />
                                 <!--  Year & Category  -->
                                 <Label
                                     FontSize="11"
@@ -133,9 +138,9 @@
         <!--  Empty State  -->
         <VerticalStackLayout
             Grid.Row="2"
-            Margin="0,60,0,0"
             HorizontalOptions="Center"
             IsVisible="{Binding HasSearchResults, Converter={StaticResource InvertedBoolConverter}}"
+            Margin="0,60,0,0"
             Spacing="12"
             VerticalOptions="Center">
             <Label

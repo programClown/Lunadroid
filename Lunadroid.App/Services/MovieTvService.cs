@@ -1,8 +1,8 @@
-﻿using Lunadroid.App.Models;
+﻿using System.Text.Json;
+using System.Text.RegularExpressions;
+using Lunadroid.App.Models;
 using Lunadroid.Core.Api;
 using Lunadroid.Core.Services;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace Lunadroid.App.Services;
 
@@ -28,9 +28,9 @@ public class MovieTvService
 
         try
         {
-            ApiSourceInfo site = isAdult ? AppSettings.AdultApiSitesConfig[source] : AppSettings.ApiSitesConfig[source];
+            var site = isAdult ? AppSettings.AdultApiSitesConfig[source] : AppSettings.ApiSitesConfig[source];
             var apiService = _apiFactory.CreateRefitClient<IMovieTvApi>(new Uri(site.ApiBaseUrl));
-            string results = await apiService.SearchVideos(name);
+            var results = await apiService.SearchVideos(name);
             var json = JsonSerializer.Deserialize<VideoSubject>(results,
                 new JsonSerializerOptions
                 {
@@ -46,24 +46,24 @@ public class MovieTvService
                         Id = x.VodId,
                         Source = source,
                         SourceName = site.Name,
-                        Name = x.VodName,
-                        Tag = x.TypeName,
-                        Year = int.Parse(x.VodYear),
-                        Cover = x.VodPic,
-                        Descriptor = x.VodContent,
+                        Name = x.VodName ?? string.Empty,
+                        Tag = x.TypeName ?? string.Empty,
+                        Year = int.Parse(x.VodYear ?? string.Empty),
+                        Cover = x.VodPic ?? string.Empty,
+                        Descriptor = x.VodContent ?? string.Empty,
                         ReMark = x.VodRemarks ?? "暂无介绍",
                         ApiBaseUrl = site.ApiBaseUrl
                     });
                 });
             }
 
-            int pageCount = json.PageCount;
+            var pageCount = json?.PageCount ?? 1;
             // 确定需要获取的额外页数 (最多获取maxPages页)
-            int pagesToFetch = Math.Min(pageCount - 1, AppSettings.SearchMaxPages - 1);
+            var pagesToFetch = Math.Min(pageCount - 1, AppSettings.SearchMaxPages - 1);
 
-            for (int i = 2; i <= pagesToFetch + 1; i++)
+            for (var i = 2; i <= pagesToFetch + 1; i++)
             {
-                string pageResults = await apiService.PageSearchVideos(name, i);
+                var pageResults = await apiService.PageSearchVideos(name, i);
                 var pageJson = JsonSerializer.Deserialize<VideoSubject>(pageResults,
                     new JsonSerializerOptions
                     {
@@ -78,11 +78,11 @@ public class MovieTvService
                             Id = x.VodId,
                             Source = source,
                             SourceName = site.Name,
-                            Name = x.VodName,
-                            Tag = x.TypeName,
-                            Year = int.Parse(x.VodYear),
-                            Cover = x.VodPic,
-                            Descriptor = x.VodContent,
+                            Name = x.VodName ?? string.Empty,
+                            Tag = x.TypeName ?? string.Empty,
+                            Year = int.Parse(x.VodYear ?? string.Empty),
+                            Cover = x.VodPic ?? string.Empty,
+                            Descriptor = x.VodContent ?? string.Empty,
                             ReMark = x.VodRemarks ?? "暂无介绍",
                             ApiBaseUrl = site.ApiBaseUrl
                         });
@@ -98,15 +98,18 @@ public class MovieTvService
         return searchResults;
     }
 
-    public async Task<DetailResult?> SearchDetail(string source, string vodId, bool isAdult = false)
+    public async Task<DetailResult?> SearchDetail(string source, string vodId)
     {
         try
         {
-            ApiSourceInfo site = isAdult ? AppSettings.AdultApiSitesConfig[source] : AppSettings.ApiSitesConfig[source];
+            var site = AppSettings.ApiSitesConfig.TryGetValue(source, out var value)
+                ? value
+                : AppSettings.AdultApiSitesConfig[source];
+
             if (_appConfigService.Config.ForceApiNeedSpecialSource || string.IsNullOrEmpty(site.DetailBaseUrl))
             {
                 var apiService = _apiFactory.CreateRefitClient<IMovieTvApi>(new Uri(site.ApiBaseUrl));
-                string results = await apiService.GetVideoDetail(vodId);
+                var results = await apiService.GetVideoDetail(vodId);
 
                 var json = JsonSerializer.Deserialize<VideoSubject>(results,
                     new JsonSerializerOptions
@@ -115,28 +118,24 @@ public class MovieTvService
                     });
                 if (json is { List.Count: > 0 })
                 {
-                    VideoSubSubject videoDetail = json.List[0];
-                    var detailResult = new DetailResult();
+                    var videoDetail = json.List[0];
                     var episodes = videoDetail.VodPlayUrl?
                         .Split("$$$", StringSplitOptions.RemoveEmptyEntries) // 分割播放源
-                        .Take(1)                                             // 只取第一个播放源
+                        .Take(1) // 只取第一个播放源
                         .SelectMany(mainSource => mainSource
                                 .Split("#", StringSplitOptions.RemoveEmptyEntries) // 分割剧集
-                                .Select(episodeItem => episodeItem.Split('$'))     // 分割剧集信息
+                                .Select(episodeItem => episodeItem.Split('$')) // 分割剧集信息
                                 .Where(parts => parts.Length > 1 &&
                                                 (parts[1].StartsWith("http://") ||
                                                  parts[1].StartsWith("https://"))) // 检查合法 URL
-                                .Select(parts =>
+                                .Select(parts => new EpisodeSubject
                                 {
-                                    return new EpisodeSubject
-                                    {
-                                        Name = parts[0],
-                                        Url = parts[1]
-                                    };
+                                    Name = parts[0],
+                                    Url = parts[1]
                                 }) // 提取 URL
                         )
                         .ToList();
-                    if (episodes.Count == 0 && !string.IsNullOrEmpty(videoDetail.VodContent))
+                    if (episodes is { Count: 0 } && !string.IsNullOrEmpty(videoDetail.VodContent))
                     {
                         var urls = Regex.Matches(videoDetail.VodContent, AppSettings.M3U8_PATTERN)
                             .Select(m => m.Value)
@@ -174,7 +173,7 @@ public class MovieTvService
             else
             {
                 var apiService = _apiFactory.CreateRefitClient<IMovieTvApi>(new Uri(site.DetailBaseUrl));
-                string results = await apiService.GetSpecialSourceVideoDetail(vodId);
+                var results = await apiService.GetSpecialSourceVideoDetail(vodId);
 
                 // 使用通用模式提取m3u8链接
                 var matches = new List<string>();

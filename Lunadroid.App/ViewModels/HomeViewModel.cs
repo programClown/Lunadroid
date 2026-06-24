@@ -1,9 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lunadroid.App.Models;
 using Lunadroid.App.Services;
+using Lunadroid.App.Views;
 using Lunadroid.Core.Services;
-using System.Collections.ObjectModel;
 
 namespace Lunadroid.App.ViewModels;
 
@@ -40,7 +41,7 @@ public partial class HomeViewModel : BaseViewModel
             return;
         }
 
-        string keyword = SearchText.Trim();
+        var keyword = SearchText.Trim();
 
         SearchResults.Clear();
         HasSearchResults = false;
@@ -50,15 +51,15 @@ public partial class HomeViewModel : BaseViewModel
 
         _searchCts?.Cancel();
         _searchCts = new CancellationTokenSource();
-        CancellationToken token = _searchCts.Token;
+        var token = _searchCts.Token;
 
         try
         {
-            foreach (string api in AppSettings.SelectApis)
+            foreach (var api in AppSettings.SelectApis)
             {
                 var ones = await _movieTvService.Search(api, keyword);
                 // ones.ForEach(x => SearchResults.Add(x));
-                foreach (VedioSearchResult vedioSearchResult in ones)
+                foreach (var vedioSearchResult in ones)
                 {
                     SearchResults.Add(vedioSearchResult);
                 }
@@ -73,6 +74,7 @@ public partial class HomeViewModel : BaseViewModel
                 IsSearchOngoing = false;
                 return;
             }
+
             SearchStatusText = SearchResults.Count > 0
                 ? $"搜索完成，共找到 {SearchResults.Count} 个结果"
                 : "未找到相关影视资源";
@@ -100,7 +102,7 @@ public partial class HomeViewModel : BaseViewModel
     {
         try
         {
-            FileResult? result = await FilePicker.Default.PickAsync(new PickOptions
+            var result = await FilePicker.Default.PickAsync(new PickOptions
             {
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
@@ -128,8 +130,11 @@ public partial class HomeViewModel : BaseViewModel
     {
         if (movie == null) return;
 
-        await Shell.Current.GoToAsync(
-            $"PlayerPage?source={Uri.EscapeDataString(movie.Source)}&vodId={Uri.EscapeDataString(movie.Id)}");
+        var navigationParameters = new Dictionary<string, object>
+        {
+            { "Online", movie }
+        };
+        await Shell.Current.GoToAsync(nameof(PlayerPage), navigationParameters);
     }
 
     [RelayCommand]

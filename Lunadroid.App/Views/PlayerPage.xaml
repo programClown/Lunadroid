@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <uranium:UraniumContentPage
+    Title="播放"
     x:Class="Lunadroid.App.Views.PlayerPage"
+    x:DataType="vm:PlayerViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:Lunadroid.App.Controls"
     xmlns:material="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-    xmlns:models="clr-namespace:Lunadroid.App.Models"
     xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
     xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
-    Title="播放"
-    x:DataType="vm:PlayerViewModel">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Grid ColumnDefinitions="3*,2*" RowDefinitions="*">
+    <Grid RowDefinitions="*,Auto">
 
         <Border
-            Grid.Row="0"
-            Grid.Column="0"
             BackgroundColor="Black"
+            Grid.Row="0"
             StrokeShape="Rectangle">
             <controls:VideoPlayer
                 ShouldAutoPlay="True"
@@ -26,8 +24,7 @@
         </Border>
 
         <Grid
-            Grid.Row="0"
-            Grid.Column="1"
+            Grid.Row="1"
             Margin="12,8"
             RowDefinitions="Auto,*">
 
@@ -44,43 +41,43 @@
 
                     <HorizontalStackLayout Spacing="8">
                         <Border
-                            Padding="6,2"
                             BackgroundColor="{StaticResource PrimaryContainer}"
+                            Padding="6,2"
                             StrokeShape="RoundRectangle 4">
                             <Label
                                 FontSize="12"
-                                Text="{Binding Type}"
+                                Text="{Binding VideoDetail.Type}"
                                 TextColor="{StaticResource OnPrimaryContainer}" />
                         </Border>
 
                         <Border
-                            Padding="6,2"
                             BackgroundColor="{StaticResource SecondaryContainer}"
+                            Padding="6,2"
                             StrokeShape="RoundRectangle 4">
                             <Label
                                 FontSize="12"
-                                Text="{Binding Area}"
+                                Text="{Binding VideoDetail.Area}"
                                 TextColor="{StaticResource OnSecondaryContainer}" />
                         </Border>
 
                         <Border
-                            Padding="6,2"
                             BackgroundColor="{StaticResource TertiaryContainer}"
+                            Padding="6,2"
                             StrokeShape="RoundRectangle 4">
                             <Label
                                 FontSize="12"
-                                Text="{Binding Year}"
+                                Text="{Binding VideoDetail.Year}"
                                 TextColor="{StaticResource OnTertiaryContainer}" />
                         </Border>
 
                         <Border
-                            Padding="6,2"
                             BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
-                                                              Dark={StaticResource Gray800}}"
+                                                              Dark={StaticResource Gray900}}"
+                            Padding="6,2"
                             StrokeShape="RoundRectangle 4">
                             <Label
                                 FontSize="12"
-                                Text="{Binding SourceName}"
+                                Text="{Binding VideoDetail.SourceName}"
                                 TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
                                                             Dark={StaticResource Gray300}}" />
                         </Border>
@@ -97,7 +94,7 @@
                             <Label
                                 FontSize="13"
                                 LineBreakMode="TailTruncation"
-                                Text="{Binding Director}"
+                                Text="{Binding VideoDetail.Director}"
                                 TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                             Dark={StaticResource Gray200}}" />
                         </HorizontalStackLayout>
@@ -113,7 +110,7 @@
                                 FontSize="13"
                                 LineBreakMode="TailTruncation"
                                 MaxLines="2"
-                                Text="{Binding Actor}"
+                                Text="{Binding VideoDetail.Actor}"
                                 TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                             Dark={StaticResource Gray200}}" />
                         </HorizontalStackLayout>
@@ -123,7 +120,7 @@
                         FontSize="13"
                         LineBreakMode="WordWrap"
                         MaxLines="4"
-                        Text="{Binding Desc}"
+                        Text="{Binding VideoDetail.Desc}"
                         TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
                                                     Dark={StaticResource Gray400}}" />
                 </VerticalStackLayout>
@@ -131,10 +128,10 @@
 
             <Grid Grid.Row="1" RowDefinitions="Auto,*">
                 <Label
-                    Grid.Row="0"
-                    Margin="0,0,0,6"
                     FontAttributes="Bold"
                     FontSize="15"
+                    Grid.Row="0"
+                    Margin="0,0,0,6"
                     Text="剧集"
                     TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                 Dark={StaticResource White}}" />
@@ -144,22 +141,22 @@
                     ItemSizingStrategy="MeasureFirstItem"
                     ItemsSource="{Binding Episodes}">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:EpisodeSubject">
+                        <DataTemplate x:DataType="vm:EpisodeSubjectItem">
                             <Border
-                                Margin="0,3"
-                                Padding="12,8"
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
                                                                   Dark={StaticResource Gray900}}"
+                                Margin="0,3"
+                                Padding="12,8"
                                 Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
-                                                         Dark={StaticResource Gray700}}"
+                                                         Dark={StaticResource Gray600}}"
                                 StrokeShape="RoundRectangle 8">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=SelectEpisodeCommand}" CommandParameter="{Binding}" />
                                 </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
                                     <ImageButton
-                                        Grid.Column="0"
                                         BackgroundColor="Transparent"
+                                        Grid.Column="0"
                                         HeightRequest="28"
                                         Source="{FontImageSource FontFamily=MaterialOutlined,
                                                                  Glyph={x:Static material:MaterialOutlined.Play_circle},
@@ -168,8 +165,8 @@
                                         VerticalOptions="Center"
                                         WidthRequest="28" />
                                     <Label
-                                        Grid.Column="1"
                                         FontSize="14"
+                                        Grid.Column="1"
                                         Text="{Binding Name}"
                                         TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                                     Dark={StaticResource White}}"
@@ -181,7 +178,7 @@
                                             <VisualState x:Name="Normal" />
                                             <VisualState x:Name="PointerOver">
                                                 <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource PrimaryContainer}, Dark={StaticResource Gray800}}" />
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource PrimaryContainer}, Dark={StaticResource Gray900}}" />
                                                 </VisualState.Setters>
                                             </VisualState>
                                         </VisualStateGroup>
