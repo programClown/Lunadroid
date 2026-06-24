@@ -11,7 +11,7 @@
     xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid RowDefinitions="300,Auto">
 
         <Border
             BackgroundColor="Black"
@@ -30,7 +30,6 @@
 
             <ScrollView Grid.Row="0" Margin="0,0,0,8">
                 <VerticalStackLayout Spacing="8">
-
                     <Label
                         FontAttributes="Bold"
                         FontSize="20"
@@ -136,58 +135,66 @@
                     TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                 Dark={StaticResource White}}" />
 
-                <CollectionView
-                    Grid.Row="1"
-                    ItemSizingStrategy="MeasureFirstItem"
-                    ItemsSource="{Binding Episodes}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="vm:EpisodeSubjectItem">
-                            <Border
-                                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
-                                                                  Dark={StaticResource Gray900}}"
-                                Margin="0,3"
-                                Padding="12,8"
-                                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
-                                                         Dark={StaticResource Gray600}}"
-                                StrokeShape="RoundRectangle 8">
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=SelectEpisodeCommand}" CommandParameter="{Binding}" />
-                                </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                                    <ImageButton
-                                        BackgroundColor="Transparent"
-                                        Grid.Column="0"
-                                        HeightRequest="28"
-                                        Source="{FontImageSource FontFamily=MaterialOutlined,
-                                                                 Glyph={x:Static material:MaterialOutlined.Play_circle},
-                                                                 Size=22,
-                                                                 Color={StaticResource Primary}}"
-                                        VerticalOptions="Center"
-                                        WidthRequest="28" />
-                                    <Label
-                                        FontSize="14"
-                                        Grid.Column="1"
-                                        Text="{Binding Name}"
-                                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
-                                                                    Dark={StaticResource White}}"
-                                        VerticalOptions="Center" />
-                                </Grid>
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroupList>
-                                        <VisualStateGroup x:Name="CommonStates">
-                                            <VisualState x:Name="Normal" />
-                                            <VisualState x:Name="PointerOver">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource PrimaryContainer}, Dark={StaticResource Gray900}}" />
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                        </VisualStateGroup>
-                                    </VisualStateGroupList>
-                                </VisualStateManager.VisualStateGroups>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                <ScrollView Grid.Row="1">
+
+                    <CollectionView
+                        ItemSizingStrategy="MeasureFirstItem"
+                        ItemsLayout="{OnIdiom Phone=VerticalGrid\, 3,
+                                              Tablet=VerticalGrid\, 5,
+                                              Desktop=VerticalGrid\, 6,
+                                              TV=VerticalGrid\, 6}"
+                        ItemsSource="{Binding Episodes}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:EpisodeSubjectItem">
+                                <Border
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                                      Dark={StaticResource Gray900}}"
+                                    Margin="4,3"
+                                    Padding="8,6"
+                                    Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                                             Dark={StaticResource Gray600}}"
+                                    StrokeShape="RoundRectangle 8">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=SelectEpisodeCommand}" CommandParameter="{Binding}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid RowDefinitions="Auto,Auto" RowSpacing="2">
+                                        <ImageButton
+                                            BackgroundColor="Transparent"
+                                            Grid.Row="0"
+                                            HeightRequest="24"
+                                            HorizontalOptions="Center"
+                                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                     Glyph={x:Static material:MaterialOutlined.Play_circle},
+                                                                     Size=18,
+                                                                     Color={StaticResource Primary}}"
+                                            WidthRequest="24" />
+                                        <Label
+                                            FontSize="12"
+                                            Grid.Row="1"
+                                            HorizontalOptions="Center"
+                                            HorizontalTextAlignment="Center"
+                                            LineBreakMode="TailTruncation"
+                                            Text="{Binding Name}"
+                                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                        Dark={StaticResource White}}" />
+                                    </Grid>
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal" />
+                                                <VisualState x:Name="PointerOver">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource PrimaryContainer}, Dark={StaticResource Gray900}}" />
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
             </Grid>
 
         </Grid>

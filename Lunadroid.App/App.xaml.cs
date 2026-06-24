@@ -35,10 +35,10 @@ public partial class App : Application
                 new()
                 {
                     Id = 0,
-                    Source = "www.moduzy.net",
-                    Name = "🎬魔都资源",
-                    ApiBaseUrl = "https://www.mdzyapi.com/api.php/provide/vod",
-                    DetailBaseUrl = "https://www.moduzy.net",
+                    Source = "ffzyapi.com",
+                    Name = "🎬非凡资源",
+                    ApiBaseUrl = "https://api.ffzyapi.com/api.php/provide/vod",
+                    DetailBaseUrl = "",
                     IsCustomApi = false,
                     IsAdult = false,
                     IsEnabled = true,
