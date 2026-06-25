@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <uranium:UraniumContentPage
+    Title="播放历史"
     x:Class="Lunadroid.App.Views.HistoryPage"
+    x:DataType="vm:HistoryViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
     xmlns:materialSymbols="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
     xmlns:models="clr-namespace:Lunadroid.Core.Models;assembly=Lunadroid.Core"
     xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
     xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
-    Title="播放历史"
-    x:DataType="vm:HistoryViewModel">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <Grid RowDefinitions="*">
         <Border StyleClass="SurfaceContainer,Rounded,Elevation1">
@@ -22,56 +22,56 @@
                             <Grid RowDefinitions="*">
                                 <CollectionView
                                     Grid.Row="0"
-                                    Margin="8,4"
                                     IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=HasOnlineHistories}"
-                                    ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=OnlineHistories}">
+                                    ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=OnlineHistories}"
+                                    Margin="8,4">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate x:DataType="models:PlayHistory">
                                             <Border
-                                                Margin="4,3"
-                                                Padding="12,10"
                                                 BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
                                                                                   Dark={StaticResource Gray900}}"
+                                                Margin="4,3"
+                                                Padding="12,10"
                                                 Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
                                                                          Dark={StaticResource Gray600}}"
                                                 StrokeShape="RoundRectangle 10">
                                                 <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
                                                     <Label
-                                                        Grid.Row="0"
-                                                        Grid.Column="0"
                                                         FontAttributes="Bold"
                                                         FontSize="15"
+                                                        Grid.Column="0"
+                                                        Grid.Row="0"
                                                         LineBreakMode="TailTruncation"
                                                         Text="{Binding Name}"
                                                         TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                                                     Dark={StaticResource White}}" />
                                                     <Label
-                                                        Grid.Row="1"
-                                                        Grid.Column="0"
                                                         FontSize="12"
+                                                        Grid.Column="0"
+                                                        Grid.Row="1"
                                                         TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
                                                                                     Dark={StaticResource Gray400}}">
                                                         <Label.Text>
                                                             <MultiBinding StringFormat="{}{0} · {1}">
-                                                                <Binding Path="Source" />
+                                                                <Binding Path="SourceName" />
                                                                 <Binding Path="Episode" />
                                                             </MultiBinding>
                                                         </Label.Text>
                                                     </Label>
                                                     <Label
-                                                        Grid.Row="2"
-                                                        Grid.Column="0"
                                                         FontSize="11"
+                                                        Grid.Column="0"
+                                                        Grid.Row="2"
                                                         Text="{Binding UpdateTime, Converter={StaticResource RelativeTimeConverter}}"
                                                         TextColor="{AppThemeBinding Light={StaticResource Outline},
                                                                                     Dark={StaticResource Gray500}}" />
                                                     <ImageButton
-                                                        Grid.Row="0"
-                                                        Grid.RowSpan="3"
-                                                        Grid.Column="1"
                                                         BackgroundColor="Transparent"
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=DeleteHistoryCommand}"
                                                         CommandParameter="{Binding}"
+                                                        Grid.Column="1"
+                                                        Grid.Row="0"
+                                                        Grid.RowSpan="3"
                                                         HeightRequest="32"
                                                         HorizontalOptions="Center"
                                                         Source="{FontImageSource FontFamily=MaterialOutlined,
@@ -89,9 +89,9 @@
 
                                 <VerticalStackLayout
                                     Grid.Row="0"
-                                    Margin="0,60,0,0"
                                     HorizontalOptions="Center"
                                     IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=HasOnlineHistories, Converter={StaticResource InvertedBoolConverter}}"
+                                    Margin="0,60,0,0"
                                     Spacing="12"
                                     VerticalOptions="Center">
                                     <Label
@@ -122,51 +122,51 @@
                             <Grid RowDefinitions="*">
                                 <CollectionView
                                     Grid.Row="0"
-                                    Margin="8,4"
                                     IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=HasLocalHistories}"
-                                    ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=LocalHistories}">
+                                    ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=LocalHistories}"
+                                    Margin="8,4">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate x:DataType="models:PlayHistory">
                                             <Border
-                                                Margin="4,3"
-                                                Padding="12,10"
                                                 BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
                                                                                   Dark={StaticResource Gray900}}"
+                                                Margin="4,3"
+                                                Padding="12,10"
                                                 Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
                                                                          Dark={StaticResource Gray600}}"
                                                 StrokeShape="RoundRectangle 10">
                                                 <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
                                                     <Label
-                                                        Grid.Row="0"
-                                                        Grid.Column="0"
                                                         FontAttributes="Bold"
                                                         FontSize="15"
+                                                        Grid.Column="0"
+                                                        Grid.Row="0"
                                                         LineBreakMode="TailTruncation"
                                                         Text="{Binding Name}"
                                                         TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                                                     Dark={StaticResource White}}" />
                                                     <Label
-                                                        Grid.Row="1"
-                                                        Grid.Column="0"
                                                         FontSize="12"
+                                                        Grid.Column="0"
+                                                        Grid.Row="1"
                                                         LineBreakMode="TailTruncation"
                                                         Text="{Binding Url}"
                                                         TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
                                                                                     Dark={StaticResource Gray400}}" />
                                                     <Label
-                                                        Grid.Row="2"
-                                                        Grid.Column="0"
                                                         FontSize="11"
+                                                        Grid.Column="0"
+                                                        Grid.Row="2"
                                                         Text="{Binding UpdateTime, Converter={StaticResource RelativeTimeConverter}}"
                                                         TextColor="{AppThemeBinding Light={StaticResource Outline},
                                                                                     Dark={StaticResource Gray500}}" />
                                                     <ImageButton
-                                                        Grid.Row="0"
-                                                        Grid.RowSpan="3"
-                                                        Grid.Column="1"
                                                         BackgroundColor="Transparent"
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=DeleteHistoryCommand}"
                                                         CommandParameter="{Binding}"
+                                                        Grid.Column="1"
+                                                        Grid.Row="0"
+                                                        Grid.RowSpan="3"
                                                         HeightRequest="32"
                                                         HorizontalOptions="Center"
                                                         Source="{FontImageSource FontFamily=MaterialOutlined,
@@ -184,9 +184,9 @@
 
                                 <VerticalStackLayout
                                     Grid.Row="0"
-                                    Margin="0,60,0,0"
                                     HorizontalOptions="Center"
                                     IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:HistoryViewModel}}, Path=HasLocalHistories, Converter={StaticResource InvertedBoolConverter}}"
+                                    Margin="0,60,0,0"
                                     Spacing="12"
                                     VerticalOptions="Center">
                                     <Label

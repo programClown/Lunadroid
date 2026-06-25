@@ -28,7 +28,7 @@ public partial class SettingsPage : UraniumContentPage
         if (sender is Switch sw && sw.BindingContext is ApiSourceItem item)
         {
             item.Enable = e.Value;
-            _viewModel.ToggleApiSourceEnabledAsync(item).FireAndForget();
+            _viewModel.ToggleApiSourceEnabledAsync(item);
         }
     }
 }

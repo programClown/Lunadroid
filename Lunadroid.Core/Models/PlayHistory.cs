@@ -11,6 +11,7 @@ public class PlayHistory
     public string? Episode { get; set; } //剧集
     public string? Url { get; set; } //播放地址
     public string? Source { get; set; } //来源
+    public string? SourceName { get; set; } //来源名称
     public int PlaybackPosition { get; set; } //播放位置
     public int Duration { get; set; } //总时长
     public int TotalEpisodeCount { get; set; } //总集数

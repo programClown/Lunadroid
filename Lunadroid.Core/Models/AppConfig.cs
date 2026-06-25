@@ -7,7 +7,6 @@ public class AppConfig
     public string ThemeMode { get; set; } = "System";
     public bool SecurityLockEnabled { get; set; }
     public string? PinCode { get; set; }
-    public bool BiometricEnabled { get; set; }
     public string CloudSourceUrl { get; set; } = "https://pz.v88.qzz.io/?format=0&source=full";
     public string DownloadDirectory { get; set; } = string.Empty;
 

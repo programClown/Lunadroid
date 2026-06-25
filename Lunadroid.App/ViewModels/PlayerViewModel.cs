@@ -71,7 +71,8 @@ public partial class PlayerViewModel : BaseViewModel
             }
 
             EpisodesCountText = $"共{Episodes.Count}集";
-            PlayHistory? viewHistory = await _databaseService.GetPlayHistoryAsync(VideoDetail.VodId, VideoDetail.Source, VideoDetail.Title);
+            var viewHistory =
+                await _databaseService.GetPlayHistoryAsync(VideoDetail.VodId, VideoDetail.Source, VideoDetail.Title);
             if (viewHistory is not null)
             {
                 Episodes[Episodes.IndexOf(Episodes.FirstOrDefault(ep => ep.Name == viewHistory.Episode))].Watched =
@@ -99,12 +100,14 @@ public partial class PlayerViewModel : BaseViewModel
             WebVideoUrl = _videoUrl;
             MauiVideoUrl = "";
         }
+
         // 保存播放历史
         var history = new PlayHistory
         {
             VodId = VideoDetail.VodId,
             Name = VideoDetail.Title,
             Source = VideoDetail.Source,
+            SourceName = VideoDetail.SourceName,
             Url = episode.Url,
             Episode = episode.Name,
             TotalEpisodeCount = VideoDetail.Episodes.Count,
