@@ -1,13 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<uranium:UraniumContentPage x:Class="Lunadroid.App.Views.ProfilePage"
-             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
-             xmlns:local="clr-namespace:Lunadroid.App.Views"
-             Title="我的">
-    <StackLayout>
-        <Label Text="我的"
-            HorizontalOptions="Center"
-            VerticalOptions="Center"/>
-    </StackLayout>
+
+<uranium:UraniumContentPage
+    x:Class="Lunadroid.App.Views.ProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:materialSymbols="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    Title="我的">
+    <VerticalStackLayout Padding="16,20" Spacing="12">
+        <Border
+            Padding="16,12"
+            BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                              Dark={StaticResource Gray900}}"
+            Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                     Dark={StaticResource Gray600}}"
+            StrokeShape="RoundRectangle 12">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnSettingsTapped" />
+            </Border.GestureRecognizers>
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Label
+                    Grid.Column="0"
+                    FontSize="24"
+                    Text="⚙️"
+                    VerticalOptions="Center" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="16"
+                    Text="设置"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource White}}"
+                    VerticalOptions="Center" />
+                <Image
+                    Grid.Column="2"
+                    Source="{FontImageSource FontFamily=MaterialOutlined,
+                                             Size=24,
+                                             Color={AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                    Dark={StaticResource Gray400}},
+                                             Glyph={x:Static materialSymbols:MaterialOutlined.Chevron_right}}"
+                    VerticalOptions="Center" />
+            </Grid>
+        </Border>
+    </VerticalStackLayout>
 </uranium:UraniumContentPage>

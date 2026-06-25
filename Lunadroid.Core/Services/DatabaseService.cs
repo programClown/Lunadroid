@@ -50,6 +50,11 @@ public class DatabaseService
         return await _database.InsertAsync(source);
     }
 
+    public async Task<int> AddApiSourcesAsync(List<ApiSource> sources)
+    {
+        return await _database.InsertAllAsync(sources);
+    }
+
     public async Task<int> UpdateApiSourceAsync(ApiSource source)
     {
         return await _database.UpdateAsync(source);

@@ -50,6 +50,7 @@ public static class MauiProgram
         builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<HistoryViewModel>();
         builder.Services.AddTransient<PlayerViewModel>();
+        builder.Services.AddTransient<SettingsViewModel>();
 
         return builder.Build();
     }

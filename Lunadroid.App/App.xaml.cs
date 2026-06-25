@@ -2,6 +2,7 @@
 using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
 using Environment = Android.OS.Environment;
+using File = Java.IO.File;
 
 namespace Lunadroid.App;
 
@@ -25,30 +26,38 @@ public partial class App : Application
         try
         {
             // Initialize logging
-            var publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
-            var logDir = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "logs");
+            File? publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
+            string logDir = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "logs");
             Logger.Initialize(logDir);
             Logger.Info("App starting...");
 
-            var appSources = new List<ApiSource>
-            {
-                new()
-                {
-                    Id = 0,
-                    Source = "ffzyapi.com",
-                    Name = "🎬非凡资源",
-                    ApiBaseUrl = "https://api.ffzyapi.com/api.php/provide/vod",
-                    DetailBaseUrl = "",
-                    IsCustomApi = false,
-                    IsAdult = false,
-                    IsEnabled = true,
-                    CreateTime = DateTime.Now
-                }
-            };
-            AppSettings.UpdateSites(appSources);
-
-            // Initialize database synchronously-fast (CreateTableAsync is ~20ms per table)
             await databaseService.InitializeAsync();
+
+            var appSources = await databaseService.GetApiSourcesAsync();
+            if (appSources.Count == 0)
+            {
+                appSources = new List<ApiSource>
+                {
+                    new()
+                    {
+                        Id = 0,
+                        Source = "ffzyapi.com",
+                        Name = "🎬非凡资源",
+                        ApiBaseUrl = "https://api.ffzyapi.com/api.php/provide/vod",
+                        DetailBaseUrl = "",
+                        IsCustomApi = false,
+                        IsAdult = false,
+                        IsEnabled = true,
+                        CreateTime = DateTime.Now
+                    }
+                };
+                foreach (ApiSource s in appSources)
+                {
+                    await databaseService.AddApiSourceAsync(s);
+                }
+            }
+
+            AppSettings.UpdateSites(appSources);
             _dbReady.TrySetResult();
         }
         catch (Exception ex)
@@ -76,7 +85,7 @@ public partial class App : Application
             // Wait for DB init + seeding to finish before reading settings
             await _dbReady.Task;
             var appConfigService = Services.GetRequiredService<AppConfigService>();
-            var config = appConfigService.Config;
+            AppConfig config = appConfigService.Config;
 
             Page startPage;
 

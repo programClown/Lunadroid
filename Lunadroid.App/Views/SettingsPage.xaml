@@ -1,13 +1,399 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<uranium:UraniumContentPage x:Class="Lunadroid.App.Views.SettingsPage"
-             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
-             xmlns:local="clr-namespace:Lunadroid.App.Views"
-             Title="设置">
-    <StackLayout>
-        <Label Text="设置"
-            HorizontalOptions="Center"
-            VerticalOptions="Center"/>
-    </StackLayout>
+
+<uranium:UraniumContentPage
+    x:Class="Lunadroid.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:materialSymbols="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
+    Title="设置"
+    x:DataType="vm:SettingsViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="8">
+
+            <!--  云端资源拉取  -->
+            <Border
+                Padding="16,12"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                  Dark={StaticResource Gray900}}"
+                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                         Dark={StaticResource Gray600}}"
+                StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="10">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="📡 资源管理"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                    Dark={StaticResource White}}" />
+
+                    <Grid
+                        ColumnDefinitions="*,Auto"
+                        ColumnSpacing="8"
+                        RowDefinitions="Auto,Auto">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="13"
+                            Text="云端资源地址"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                        Dark={StaticResource Gray400}}" />
+                        <Entry
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            FontSize="13"
+                            Placeholder="请输入云端资源地址"
+                            Text="{Binding CloudSourceUrl}" />
+                    </Grid>
+
+                    <Button
+                        Command="{Binding FetchSourcesFromCloudCommand}"
+                        HorizontalOptions="Fill"
+                        IsEnabled="{Binding IsFetchingSources, Converter={StaticResource InvertedBoolConverter}}"
+                        Text="从云端拉取资源" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button
+                            Grid.Column="0"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Secondary},
+                                                              Dark={StaticResource SecondaryDark}}"
+                            Command="{Binding ImportSourcesFromJsonCommand}"
+                            IsEnabled="{Binding IsImporting, Converter={StaticResource InvertedBoolConverter}}"
+                            Text="导入JSON" />
+                        <Button
+                            Grid.Column="1"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Secondary},
+                                                              Dark={StaticResource SecondaryDark}}"
+                            Command="{Binding ExportSourcesToJsonCommand}"
+                            IsEnabled="{Binding IsExporting, Converter={StaticResource InvertedBoolConverter}}"
+                            Text="导出JSON" />
+                    </Grid>
+
+                    <Label
+                        FontSize="12"
+                        Text="{Binding FetchStatusText}"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                    Dark={StaticResource Gray400}}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!--  ApiSource 列表  -->
+            <Border
+                Padding="16,12"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                  Dark={StaticResource Gray900}}"
+                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                         Dark={StaticResource Gray600}}"
+                StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="📋 资源列表"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                    Dark={StaticResource White}}" />
+
+                    <CollectionView ItemsSource="{Binding ApiSourceItems}" MaximumHeightRequest="400">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ApiSourceItem">
+                                <Border
+                                    Margin="0,3"
+                                    Padding="10,8"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Background},
+                                                                      Dark={StaticResource Gray900}}"
+                                    Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                                             Dark={StaticResource Gray600}}"
+                                    StrokeShape="RoundRectangle 8">
+                                    <Grid
+                                        ColumnDefinitions="Auto,*,Auto,Auto"
+                                        ColumnSpacing="8"
+                                        RowDefinitions="Auto,Auto">
+                                        <Switch
+                                            Grid.Row="0"
+                                            Grid.RowSpan="2"
+                                            Grid.Column="0"
+                                            OnColor="{StaticResource Primary}"
+                                            Toggled="Switch_OnToggled"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            FontAttributes="Bold"
+                                            FontSize="14"
+                                            LineBreakMode="TailTruncation"
+                                            Text="{Binding Name}"
+                                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                        Dark={StaticResource White}}" />
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            FontSize="11"
+                                            LineBreakMode="MiddleTruncation"
+                                            Text="{Binding Source}"
+                                            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                        Dark={StaticResource Gray400}}" />
+                                        <Label
+                                            Grid.Row="0"
+                                            Grid.Column="2"
+                                            FontSize="14"
+                                            IsVisible="{Binding IsCustom}"
+                                            Text="自定义"
+                                            VerticalOptions="Center" />
+                                        <ImageButton
+                                            Grid.Row="0"
+                                            Grid.RowSpan="2"
+                                            Grid.Column="3"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=DeleteApiSourceCommand}"
+                                            CommandParameter="{Binding}"
+                                            HeightRequest="36"
+                                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                     Size=20,
+                                                                     Color={AppThemeBinding Light={StaticResource Error},
+                                                                                            Dark={StaticResource ErrorDark}},
+                                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Delete}}"
+                                            WidthRequest="36" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!--  Ping 测试  -->
+            <Border
+                Padding="16,12"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                  Dark={StaticResource Gray900}}"
+                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                         Dark={StaticResource Gray600}}"
+                StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label
+                            Grid.Column="0"
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            Text="⚡ 连通性测试"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}" />
+                        <Button
+                            Grid.Column="1"
+                            Padding="12,6"
+                            Command="{Binding PingAllSourcesCommand}"
+                            FontSize="13"
+                            HeightRequest="36"
+                            IsEnabled="{Binding IsPinging, Converter={StaticResource InvertedBoolConverter}}"
+                            Text="开始测试" />
+                    </Grid>
+
+                    <Label
+                        FontSize="12"
+                        Text="{Binding PingStatusText}"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                    Dark={StaticResource Gray400}}" />
+
+                    <ActivityIndicator
+                        HorizontalOptions="Center"
+                        IsRunning="{Binding IsPinging}"
+                        IsVisible="{Binding IsPinging}"
+                        Color="{StaticResource Primary}" />
+
+                    <CollectionView ItemsSource="{Binding PingResults}" MaximumHeightRequest="300">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:PingResult">
+                                <Border
+                                    Margin="0,2"
+                                    Padding="10,6"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Background},
+                                                                      Dark={StaticResource Gray900}}"
+                                    Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                                             Dark={StaticResource Gray600}}"
+                                    StrokeShape="RoundRectangle 6">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <Label
+                                            Grid.Column="0"
+                                            FontSize="13"
+                                            LineBreakMode="TailTruncation"
+                                            Text="{Binding Name}"
+                                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                        Dark={StaticResource White}}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            FontAttributes="Bold"
+                                            FontSize="13"
+                                            Text="{Binding Status}"
+                                            TextColor="{Binding StatusColor}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!--  AppConfig 设置  -->
+            <Border
+                Padding="16,12"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                  Dark={StaticResource Gray900}}"
+                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                         Dark={StaticResource Gray600}}"
+                StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="12">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="⚙️ 应用配置"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                    Dark={StaticResource White}}" />
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="14"
+                            Text="自动连播"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}"
+                            VerticalOptions="Center" />
+                        <Switch
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsToggled="{Binding AutoPlayNext}"
+                            OnColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="14"
+                            Text="自动播放"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}"
+                            VerticalOptions="Center" />
+                        <Switch
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsToggled="{Binding Autoplay}"
+                            OnColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="14"
+                            Text="广告过滤"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}"
+                            VerticalOptions="Center" />
+                        <Switch
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsToggled="{Binding FilterAds}"
+                            OnColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="14"
+                            Text="分片广告过滤"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}"
+                            VerticalOptions="Center" />
+                        <Switch
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsToggled="{Binding AdFilteringEnabled}"
+                            OnColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="14"
+                            Text="豆瓣API"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}"
+                            VerticalOptions="Center" />
+                        <Switch
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsToggled="{Binding DoubanApiEnabled}"
+                            OnColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="14"
+                            Text="首页自动加载豆瓣"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}"
+                            VerticalOptions="Center" />
+                        <Switch
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsToggled="{Binding HomeAutoLoadDoubanEnabled}"
+                            OnColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="14"
+                            Text="强制使用API"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}"
+                            VerticalOptions="Center" />
+                        <Switch
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsToggled="{Binding ForceApiNeedSpecialSource}"
+                            OnColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                    </Grid>
+
+                    <Grid
+                        ColumnDefinitions="*,Auto"
+                        RowDefinitions="Auto,Auto"
+                        RowSpacing="4">
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            FontSize="14"
+                            Text="播放器超时(ms)"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}"
+                            VerticalOptions="Center" />
+                        <Entry
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            FontSize="13"
+                            Keyboard="Numeric"
+                            Text="{Binding Timeout}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
 </uranium:UraniumContentPage>
