@@ -1,26 +1,41 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<uranium:UraniumContentPage
-    Title="播放"
+<ContentPage
     x:Class="Lunadroid.App.Views.PlayerPage"
-    x:DataType="vm:PlayerViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:controls="clr-namespace:Lunadroid.App.Controls"
-    xmlns:material="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:materialSyml="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
     xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    Title="播放"
+    x:DataType="vm:PlayerViewModel">
 
     <Grid RowDefinitions="Auto,*">
+        <VerticalStackLayout
+            Margin="{OnIdiom 10,
+                             Phone=0}"
+            Spacing="12"
+            StyleClass="Elevation1">
+            <uranium:Dropdown
+                ItemsSource="{Binding PlaySurfaces}"
+                Placeholder="Choose"
+                SelectedItem="{Binding SelectedPlaySurface, Mode=TwoWay}" />
 
-        <controls:VideoPlayer
-            Grid.Row="0"
-            HeightRequest="240"
-            HorizontalOptions="Fill"
-            ShouldAutoPlay="True"
-            Source="{Binding VideoUrl}"
-            VideoTitle="{Binding Title}"
-            x:Name="VideoPlayer" />
+            <toolkit:MediaElement
+                AndroidViewType="SurfaceView"
+                HeightRequest="240"
+                HorizontalOptions="Fill"
+                IsVisible="{Binding IsMauiPlayer}"
+                ShouldAutoPlay="True"
+                ShouldShowPlaybackControls="True"
+                Source="{Binding MauiVideoUrl, Mode=OneWay}" />
+
+            <WebView
+                HeightRequest="240"
+                IsVisible="{Binding IsMauiPlayer, Converter={StaticResource InvertedBoolConverter}}"
+                Source="{Binding WebVideoUrl, Mode=OneWay}" />
+        </VerticalStackLayout>
 
         <Grid
             Grid.Row="1"
@@ -33,14 +48,14 @@
                         FontAttributes="Bold"
                         FontSize="20"
                         LineBreakMode="WordWrap"
-                        Text="{Binding Title}"
+                        Text="{Binding VideoDetail.Title}"
                         TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                     Dark={StaticResource White}}" />
 
                     <HorizontalStackLayout Spacing="8">
                         <Border
-                            BackgroundColor="{StaticResource PrimaryContainer}"
                             Padding="6,2"
+                            BackgroundColor="{StaticResource PrimaryContainer}"
                             StrokeShape="RoundRectangle 4">
                             <Label
                                 FontSize="12"
@@ -49,8 +64,8 @@
                         </Border>
 
                         <Border
-                            BackgroundColor="{StaticResource SecondaryContainer}"
                             Padding="6,2"
+                            BackgroundColor="{StaticResource SecondaryContainer}"
                             StrokeShape="RoundRectangle 4">
                             <Label
                                 FontSize="12"
@@ -59,8 +74,8 @@
                         </Border>
 
                         <Border
-                            BackgroundColor="{StaticResource TertiaryContainer}"
                             Padding="6,2"
+                            BackgroundColor="{StaticResource TertiaryContainer}"
                             StrokeShape="RoundRectangle 4">
                             <Label
                                 FontSize="12"
@@ -69,9 +84,9 @@
                         </Border>
 
                         <Border
+                            Padding="6,2"
                             BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariant},
                                                               Dark={StaticResource Gray900}}"
-                            Padding="6,2"
                             StrokeShape="RoundRectangle 4">
                             <Label
                                 FontSize="12"
@@ -132,10 +147,10 @@
 
             <Grid Grid.Row="1" RowDefinitions="Auto,*">
                 <Label
-                    FontAttributes="Bold"
-                    FontSize="15"
                     Grid.Row="0"
                     Margin="0,0,0,6"
+                    FontAttributes="Bold"
+                    FontSize="15"
                     Text="剧集"
                     TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                 Dark={StaticResource White}}" />
@@ -152,10 +167,10 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="vm:EpisodeSubjectItem">
                                 <Border
-                                    BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
-                                                                      Dark={StaticResource Gray900}}"
                                     Margin="4,3"
                                     Padding="8,6"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                                      Dark={StaticResource Gray900}}"
                                     Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
                                                              Dark={StaticResource Gray600}}"
                                     StrokeShape="RoundRectangle 8">
@@ -168,7 +183,7 @@
                                             HeightRequest="24"
                                             HorizontalOptions="Center"
                                             Source="{FontImageSource FontFamily=MaterialOutlined,
-                                                                     Glyph={x:Static material:MaterialOutlined.Play_circle},
+                                                                     Glyph={x:Static materialSyml:MaterialOutlined.Play_circle},
                                                                      Size=18,
                                                                      Color={StaticResource Primary}}"
                                             WidthRequest="24" />
@@ -180,6 +195,16 @@
                                             Text="{Binding Name}"
                                             TextColor="{AppThemeBinding Light={StaticResource OnSurface},
                                                                         Dark={StaticResource White}}"
+                                            VerticalOptions="Center"
+                                            VerticalTextAlignment="Center" />
+                                        <Label
+                                            FontSize="12"
+                                            HorizontalOptions="Center"
+                                            HorizontalTextAlignment="Center"
+                                            IsVisible="{Binding Watched}"
+                                            LineBreakMode="TailTruncation"
+                                            Text="✔"
+                                            TextColor="Orange"
                                             VerticalOptions="Center"
                                             VerticalTextAlignment="Center" />
                                     </HorizontalStackLayout>
@@ -206,4 +231,4 @@
 
     </Grid>
 
-</uranium:UraniumContentPage>
+</ContentPage>

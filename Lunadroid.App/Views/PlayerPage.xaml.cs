@@ -1,11 +1,10 @@
 using Lunadroid.App.Models;
 using Lunadroid.App.ViewModels;
 using UraniumUI.Extensions;
-using UraniumUI.Pages;
 
 namespace Lunadroid.App.Views;
 
-public partial class PlayerPage : UraniumContentPage, IQueryAttributable
+public partial class PlayerPage : ContentPage, IQueryAttributable
 {
     public PlayerPage(PlayerViewModel viewModel)
     {
@@ -15,26 +14,15 @@ public partial class PlayerPage : UraniumContentPage, IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.TryGetValue("Online", out var movieObj) && movieObj is VedioSearchResult movie)
+        if (query.TryGetValue("Online", out object? movieObj) && movieObj is VedioSearchResult movie)
         {
             var vm = (PlayerViewModel)BindingContext;
             vm.SetOnLineVideoAsync(movie).FireAndForget();
         }
-        else if (query.TryGetValue("Local", out var localObj) && localObj is string playUrl)
+        else if (query.TryGetValue("Local", out object? localObj) && localObj is string playUrl)
         {
             var vm = (PlayerViewModel)BindingContext;
             vm.SetLocalVideoAsync(playUrl).FireAndForget();
         }
-    }
-
-    protected override bool OnBackButtonPressed()
-    {
-        if (VideoPlayer.IsFullscreen)
-        {
-            VideoPlayer.ExitFullscreen();
-            return true;
-        }
-
-        return base.OnBackButtonPressed();
     }
 }

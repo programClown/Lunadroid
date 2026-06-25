@@ -4,6 +4,7 @@
     x:Class="Lunadroid.App.App"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:cvt="clr-namespace:Lunadroid.App.Converters"
     xmlns:material="clr-namespace:UraniumUI.Material.Resources;assembly=UraniumUI.Material"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:ucvt="clr-namespace:UraniumUI.Converters;assembly=UraniumUI">
@@ -16,6 +17,7 @@
             </ResourceDictionary.MergedDictionaries>
             <ucvt:StringIsNotNullOrEmptyConverter x:Key="StringIsNotNullOrEmptyConverter" />
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <cvt:RelativeTimeConverter x:Key="RelativeTimeConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

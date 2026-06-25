@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lunadroid.App.Models;
 using Lunadroid.App.Services;
+using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
 
 namespace Lunadroid.App.ViewModels;
@@ -14,9 +15,14 @@ public partial class PlayerViewModel : BaseViewModel
     [ObservableProperty] private List<EpisodeSubjectItem> _episodes = new();
 
     [ObservableProperty] private string _episodesCountText;
-    [ObservableProperty] private EpisodeSubjectItem? _selectedEpisode;
+    [ObservableProperty] private bool _isMauiPlayer;
+    [ObservableProperty] private string _mauiVideoUrl = "";
+    [ObservableProperty] private List<string> _playSurfaces = ["maui播放器", "web播放器"];
+    [ObservableProperty] private string _selectedPlaySurface = "web播放器";
     [ObservableProperty] private DetailResult? _videoDetail;
-    [ObservableProperty] private string _videoUrl = "https://vod.360zyx.vip/20250708/7T2xjBRd/index.m3u8";
+    private string _videoUrl = "";
+    [ObservableProperty] private string _webVideoUrl = "";
+
 
     public PlayerViewModel(MovieTvService movieTvService, DatabaseService databaseService)
     {
@@ -65,13 +71,12 @@ public partial class PlayerViewModel : BaseViewModel
             }
 
             EpisodesCountText = $"共{Episodes.Count}集";
-            // var viewHistory = _viewHistoryTable.GetSingle(his =>
-            //     his.VodId == VideoDetail.VodId && his.Source == SourceName && his.Name == VideoName);
-            // if (viewHistory is not null)
-            // {
-            //     Episodes[Episodes.IndexOf(Episodes.FirstOrDefault(ep => ep.Name == viewHistory.Episode))].Watched =
-            //         true;
-            // }
+            PlayHistory? viewHistory = await _databaseService.GetPlayHistoryAsync(VideoDetail.VodId, VideoDetail.Source, VideoDetail.Title);
+            if (viewHistory is not null)
+            {
+                Episodes[Episodes.IndexOf(Episodes.FirstOrDefault(ep => ep.Name == viewHistory.Episode))].Watched =
+                    true;
+            }
         }
         finally
         {
@@ -79,18 +84,50 @@ public partial class PlayerViewModel : BaseViewModel
         }
     }
 
-    public void LoadFromUrl(string url, string title)
+    [RelayCommand]
+    private async Task SelectEpisode(EpisodeSubjectItem? episode)
     {
-        Title = title;
-        VideoUrl = url;
+        if (episode == null || episode.Url == null) return;
+        _videoUrl = episode.Url;
+        if (IsMauiPlayer)
+        {
+            MauiVideoUrl = _videoUrl;
+            WebVideoUrl = "";
+        }
+        else
+        {
+            WebVideoUrl = _videoUrl;
+            MauiVideoUrl = "";
+        }
+        // 保存播放历史
+        var history = new PlayHistory
+        {
+            VodId = VideoDetail.VodId,
+            Name = VideoDetail.Title,
+            Source = VideoDetail.Source,
+            Url = episode.Url,
+            Episode = episode.Name,
+            TotalEpisodeCount = VideoDetail.Episodes.Count,
+            IsLocal = false
+        };
+        Episodes[Episodes.IndexOf(Episodes.FirstOrDefault(ep => ep.Name == episode.Name))].Watched =
+            true;
+        await _databaseService.AddOrUpdatePlayHistoryAsync(history);
     }
 
-    [RelayCommand]
-    private async Task SelectEpisodeAsync(EpisodeSubjectItem? episode)
+    partial void OnSelectedPlaySurfaceChanged(string value)
     {
-        if (episode == null) return;
-        SelectedEpisode = episode;
-        VideoUrl = episode.Url ?? string.Empty;
+        IsMauiPlayer = value == "maui播放器";
+        if (IsMauiPlayer)
+        {
+            MauiVideoUrl = _videoUrl;
+            WebVideoUrl = "";
+        }
+        else
+        {
+            WebVideoUrl = _videoUrl;
+            MauiVideoUrl = "";
+        }
     }
 }
 

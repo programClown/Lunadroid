@@ -1,9 +1,21 @@
-﻿namespace Lunadroid.App.Views;
+﻿using Lunadroid.App.ViewModels;
+using UraniumUI.Extensions;
+using UraniumUI.Pages;
 
-public partial class HistoryPage : UraniumUI.Pages.UraniumContentPage
+namespace Lunadroid.App.Views;
+
+public partial class HistoryPage : UraniumContentPage
 {
-    public HistoryPage()
+    public HistoryPage(HistoryViewModel viewModel)
     {
         InitializeComponent();
+        BindingContext = viewModel;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        var vm = (HistoryViewModel)BindingContext;
+        vm.LoadHistoriesAsync().FireAndForget();
     }
 }
