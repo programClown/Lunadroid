@@ -2,7 +2,6 @@
 using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
 using Environment = Android.OS.Environment;
-using File = Java.IO.File;
 
 namespace Lunadroid.App;
 
@@ -26,8 +25,8 @@ public partial class App : Application
         try
         {
             // Initialize logging
-            File? publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
-            string logDir = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "logs");
+            var publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
+            var logDir = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "logs");
             Logger.Initialize(logDir);
             Logger.Info("App starting...");
 
@@ -51,7 +50,7 @@ public partial class App : Application
                         CreateTime = DateTime.Now
                     }
                 };
-                foreach (ApiSource s in appSources)
+                foreach (var s in appSources)
                 {
                     await databaseService.AddApiSourceAsync(s);
                 }
@@ -85,7 +84,7 @@ public partial class App : Application
             // Wait for DB init + seeding to finish before reading settings
             await _dbReady.Task;
             var appConfigService = Services.GetRequiredService<AppConfigService>();
-            AppConfig config = appConfigService.Config;
+            var config = appConfigService.Config;
 
             Page startPage;
 
@@ -95,7 +94,7 @@ public partial class App : Application
             }
             else if (config.SecurityLockEnabled)
             {
-                startPage = new AppLockPage(true);
+                startPage = new AppLockPage();
             }
             else
             {

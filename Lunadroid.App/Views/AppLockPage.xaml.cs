@@ -5,7 +5,7 @@ namespace Lunadroid.App.Views;
 
 public partial class AppLockPage : UraniumContentPage
 {
-    public AppLockPage(bool isVerifying = false)
+    public AppLockPage()
     {
         InitializeComponent();
         var vm = App.Services.GetRequiredService<AppLockViewModel>();

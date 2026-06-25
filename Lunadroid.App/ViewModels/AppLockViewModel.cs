@@ -7,6 +7,7 @@ namespace Lunadroid.App.ViewModels;
 public partial class AppLockViewModel : BaseViewModel
 {
     private readonly AppConfigService _configService;
+    private string _firstPinEntry = string.Empty;
 
     [ObservableProperty] private bool _hasPin1;
 
@@ -16,6 +17,8 @@ public partial class AppLockViewModel : BaseViewModel
 
     [ObservableProperty] private bool _hasPin4;
 
+    [ObservableProperty] private bool _isConfirming;
+
     [ObservableProperty] private bool _isSetup;
 
     [ObservableProperty] private bool _isVerifying;
@@ -24,12 +27,25 @@ public partial class AppLockViewModel : BaseViewModel
 
     [ObservableProperty] private string _statusMessage = string.Empty;
 
+    [ObservableProperty] private string _subtitle = "请输入4位数字密码";
+
     public AppLockViewModel(AppConfigService configService)
     {
         _configService = configService;
-        Title = "安全验证";
-        IsVerifying = configService.Config.SecurityLockEnabled;
-        IsSetup = !configService.Config.SecurityLockEnabled;
+        var config = configService.Config;
+        IsVerifying = config.SecurityLockEnabled && !string.IsNullOrEmpty(config.PinCode);
+        IsSetup = !config.SecurityLockEnabled;
+
+        if (IsVerifying)
+        {
+            Title = "安全验证";
+            Subtitle = "请输入4位数字密码";
+        }
+        else
+        {
+            Title = "设置密码";
+            Subtitle = "请输入新的4位数字密码";
+        }
     }
 
     partial void OnPinEntryChanged(string value)
@@ -58,6 +74,12 @@ public partial class AppLockViewModel : BaseViewModel
     {
         PinEntry = string.Empty;
         StatusMessage = string.Empty;
+        if (IsConfirming)
+        {
+            IsConfirming = false;
+            _firstPinEntry = string.Empty;
+            Subtitle = "请输入新的4位数字密码";
+        }
     }
 
     [RelayCommand]
@@ -85,14 +107,36 @@ public partial class AppLockViewModel : BaseViewModel
         }
         else if (IsSetup)
         {
-            _configService.UpdateConfig(c =>
+            if (!IsConfirming)
             {
-                c.SecurityLockEnabled = true;
-                c.PinCode = PinEntry;
-            });
-            StatusMessage = "密码设置成功";
-            await Task.Delay(500);
-            Application.Current!.Windows[0].Page = new AppShell();
+                _firstPinEntry = PinEntry;
+                PinEntry = string.Empty;
+                IsConfirming = true;
+                Subtitle = "请再次输入密码以确认";
+                StatusMessage = string.Empty;
+            }
+            else
+            {
+                if (PinEntry == _firstPinEntry)
+                {
+                    _configService.UpdateConfig(c =>
+                    {
+                        c.SecurityLockEnabled = true;
+                        c.PinCode = PinEntry;
+                    });
+                    StatusMessage = "密码设置成功";
+                    await Task.Delay(500);
+                    Application.Current!.Windows[0].Page = new AppShell();
+                }
+                else
+                {
+                    StatusMessage = "两次密码不一致，请重新输入";
+                    PinEntry = string.Empty;
+                    _firstPinEntry = string.Empty;
+                    IsConfirming = false;
+                    Subtitle = "请输入新的4位数字密码";
+                }
+            }
         }
     }
 

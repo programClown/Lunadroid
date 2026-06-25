@@ -1,12 +1,14 @@
-﻿using UraniumUI.Pages;
+﻿using Lunadroid.App.ViewModels;
+using UraniumUI.Pages;
 
 namespace Lunadroid.App.Views;
 
 public partial class ProfilePage : UraniumContentPage
 {
-    public ProfilePage()
+    public ProfilePage(ProfileViewModel profileViewModel)
     {
         InitializeComponent();
+        BindingContext = profileViewModel;
     }
 
     private async void OnSettingsTapped(object? sender, TappedEventArgs e)

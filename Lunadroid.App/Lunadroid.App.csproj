@@ -20,7 +20,7 @@
         <ApplicationIdGuid>5d63d866-be76-4e06-8213-c754aed9459c</ApplicationIdGuid>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationDisplayVersion>0.1</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
@@ -75,5 +75,24 @@
             <Generator>MSBuild:Compile</Generator>
         </MauiXaml>
     </ItemGroup>
+
+    <Target Name="GenerateBuildDate" BeforeTargets="CoreCompile">
+        <PropertyGroup>
+            <BuildDate>$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))</BuildDate>
+        </PropertyGroup>
+        <ItemGroup>
+            <BuildDateLine Include="// &lt;auto-generated/&gt;"/>
+            <BuildDateLine Include="namespace Lunadroid.App%3B"/>
+            <BuildDateLine Include="public static partial class BuildDate"/>
+            <BuildDateLine Include="{"/>
+            <BuildDateLine Include="    public const string Value = &quot;$(BuildDate)&quot;%3B"/>
+            <BuildDateLine Include="}"/>
+        </ItemGroup>
+        <WriteLinesToFile
+                File="Generated\BuildDate.g.cs"
+                Lines="@(BuildDateLine)"
+                Overwrite="true"
+                WriteOnlyWhenDifferent="true"/>
+    </Target>
 
 </Project>

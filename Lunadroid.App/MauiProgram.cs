@@ -1,14 +1,13 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using CommunityToolkit.Maui;
 using Lunadroid.App.Services;
 using Lunadroid.App.ViewModels;
 using Lunadroid.Core.Api;
 using Lunadroid.Core.Services;
 using Refit;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using UraniumUI;
 using Environment = Android.OS.Environment;
-using File = Java.IO.File;
 
 namespace Lunadroid.App;
 
@@ -16,7 +15,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        MauiAppBuilder builder = MauiApp.CreateBuilder();
+        var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
@@ -34,8 +33,8 @@ public static class MauiProgram
         builder.Services.AddCommunityToolkitDialogs();
 
         // Database
-        File? publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
-        string dbPath = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "lunadroid.db");
+        var publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
+        var dbPath = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "lunadroid.db");
         builder.Services.AddSingleton(new DatabaseService(dbPath));
 
         // Config
@@ -51,6 +50,7 @@ public static class MauiProgram
         builder.Services.AddTransient<HistoryViewModel>();
         builder.Services.AddTransient<PlayerViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<ProfileViewModel>();
 
         return builder.Build();
     }
@@ -81,7 +81,7 @@ public static class MauiProgram
         };
 
         // Refit settings for IApiFactory
-        JsonSerializerOptions defaultSystemTextJsonSettings = SystemTextJsonContentSerializer.GetDefaultJsonSerializerOptions();
+        var defaultSystemTextJsonSettings = SystemTextJsonContentSerializer.GetDefaultJsonSerializerOptions();
         defaultSystemTextJsonSettings.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         var apiFactoryRefitSettings = new RefitSettings
         {
@@ -130,8 +130,8 @@ public static class MauiProgram
             .AddStandardResilienceHandler(options =>
                 {
                     options.Retry.MaxRetryAttempts = 3;
-                    options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30);  // 总的超时时间
-                    options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(5);        //每次重试的超时时间
+                    options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30); // 总的超时时间
+                    options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(5); //每次重试的超时时间
                     options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30); //熔断时间
                 }
             );

@@ -52,7 +52,6 @@ public partial class SettingsViewModel : BaseViewModel
     private readonly DatabaseService _databaseService;
     private readonly HttpClient _httpClient;
     [ObservableProperty] private bool _autoplay;
-
     [ObservableProperty] private string _cloudSourceUrl = string.Empty;
     [ObservableProperty] private string _fetchStatusText = string.Empty;
     [ObservableProperty] private bool _forceApiNeedSpecialSource;
@@ -70,7 +69,7 @@ public partial class SettingsViewModel : BaseViewModel
         _appConfigService = appConfigService;
         _httpClient = new HttpClient
         {
-            Timeout = TimeSpan.FromSeconds(30) // 设置超时时间
+            Timeout = TimeSpan.FromSeconds(30)
         };
         Title = "设置";
         LoadConfigFromService();

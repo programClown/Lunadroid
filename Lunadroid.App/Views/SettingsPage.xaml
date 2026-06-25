@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 
 <uranium:UraniumContentPage
     Title="设置"
@@ -310,6 +310,7 @@
                             Grid.Column="1"
                             Text="重置" />
                     </Grid>
+
                 </VerticalStackLayout>
             </Border>
 

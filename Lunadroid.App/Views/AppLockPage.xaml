@@ -42,7 +42,7 @@
             <Label
                 FontSize="14"
                 HorizontalOptions="Center"
-                Text="请输入4位数字密码"
+                Text="{Binding Subtitle}"
                 TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
                                             Dark={StaticResource OnSurfaceVariantDark}}" />
 
