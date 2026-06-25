@@ -1,9 +1,21 @@
-﻿namespace Lunadroid.App.Views;
+﻿using Lunadroid.App.ViewModels;
+using UraniumUI.Extensions;
+using UraniumUI.Pages;
 
-public partial class DownloadPage : UraniumUI.Pages.UraniumContentPage
+namespace Lunadroid.App.Views;
+
+public partial class DownloadPage : UraniumContentPage
 {
-    public DownloadPage()
+    public DownloadPage(DownloadViewModel viewModel)
     {
         InitializeComponent();
+        BindingContext = viewModel;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        var vm = (DownloadViewModel)BindingContext;
+        vm.LoadDownloadsAsync().FireAndForget();
     }
 }

@@ -65,6 +65,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Lunadroid.Core\Lunadroid.Core.csproj"/>
+        <ProjectReference Include="..\M3U8Download\M3U8Download.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -78,7 +79,7 @@
 
     <Target Name="GenerateBuildDate" BeforeTargets="CoreCompile">
         <PropertyGroup>
-            <BuildDate>$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))</BuildDate>
+            <BuildDate>$([System.DateTime]::Now.ToString("yyyy-MM-dd HH:mm:ss"))</BuildDate>
         </PropertyGroup>
         <ItemGroup>
             <BuildDateLine Include="// &lt;auto-generated/&gt;"/>

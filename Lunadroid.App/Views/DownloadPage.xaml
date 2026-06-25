@@ -1,50 +1,302 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <uranium:UraniumContentPage
+    Title="下载管理"
     x:Class="Lunadroid.App.Views.DownloadPage"
+    x:DataType="vm:DownloadViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI">
+    xmlns:materialSymbols="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+    xmlns:models="clr-namespace:Lunadroid.Core.Models;assembly=Lunadroid.Core"
+    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
+    <Grid RowDefinitions="Auto,*" RowSpacing="8">
 
-    <Border StyleClass="SurfaceContainer,Rounded,Elevation1">
-        <material:TabView x:Name="tabView" TabHeaderItemColumnWidth="*">
-            <material:TabItem Title="Tab One">
-                <material:TabItem.ContentTemplate>
-                    <DataTemplate>
-                        <Label
-                            Margin="50"
-                            HorizontalOptions="Center"
-                            Text="First Tab"
-                            VerticalOptions="Center" />
-                    </DataTemplate>
-                </material:TabItem.ContentTemplate>
-            </material:TabItem>
+        <Border
+            BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                              Dark={StaticResource Gray900}}"
+            Grid.Row="0"
+            Margin="12,8"
+            Padding="12"
+            Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                     Dark={StaticResource Gray600}}"
+            StrokeShape="RoundRectangle 12">
+            <VerticalStackLayout Spacing="8">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="15"
+                    Text="手动下载"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource White}}" />
+                <Entry
+                    FontSize="14"
+                    Placeholder="输入视频名称"
+                    PlaceholderColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                       Dark={StaticResource Gray500}}"
+                    Text="{Binding DownloadName, Mode=TwoWay}"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource White}}" />
+                <Entry
+                    FontSize="14"
+                    Placeholder="输入下载链接 (m3u8/视频地址)"
+                    PlaceholderColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                       Dark={StaticResource Gray500}}"
+                    Text="{Binding DownloadUrl, Mode=TwoWay}"
+                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                Dark={StaticResource White}}" />
+                <Button
+                    Command="{Binding StartDownloadCommand}"
+                    FontSize="14"
+                    HorizontalOptions="Fill"
+                    Text="开始下载" />
+            </VerticalStackLayout>
+        </Border>
 
-            <material:TabItem Title="Tab Two">
-                <material:TabItem.ContentTemplate>
-                    <DataTemplate>
-                        <Label
-                            Margin="50"
-                            HorizontalOptions="Center"
-                            Text="Second Tab"
-                            VerticalOptions="Center" />
-                    </DataTemplate>
-                </material:TabItem.ContentTemplate>
-            </material:TabItem>
+        <Border Grid.Row="1" StyleClass="SurfaceContainer,Rounded,Elevation1">
+            <material:TabView TabHeaderItemColumnWidth="*">
 
-            <material:TabItem Title="Tab Three">
-                <material:TabItem.ContentTemplate>
-                    <DataTemplate>
-                        <Label
-                            Margin="50"
-                            HorizontalOptions="Center"
-                            Text="Third Tab"
-                            VerticalOptions="Center" />
-                    </DataTemplate>
-                </material:TabItem.ContentTemplate>
-            </material:TabItem>
-        </material:TabView>
-    </Border>
+                <material:TabItem Title="正在下载">
+                    <material:TabItem.ContentTemplate>
+                        <DataTemplate>
+                            <Grid RowDefinitions="*">
+                                <CollectionView
+                                    Grid.Row="0"
+                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=HasDownloadingItems}"
+                                    ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=DownloadingItems}"
+                                    Margin="8,4">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="models:MediaDownload">
+                                            <Border
+                                                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                                                  Dark={StaticResource Gray900}}"
+                                                Margin="4,3"
+                                                Padding="12,10"
+                                                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                                                         Dark={StaticResource Gray600}}"
+                                                StrokeShape="RoundRectangle 10">
+                                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
+                                                    <Label
+                                                        FontAttributes="Bold"
+                                                        FontSize="15"
+                                                        Grid.Column="0"
+                                                        Grid.Row="0"
+                                                        LineBreakMode="TailTruncation"
+                                                        Text="{Binding Name}"
+                                                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                                    Dark={StaticResource White}}" />
+                                                    <Label
+                                                        FontSize="12"
+                                                        Grid.Column="0"
+                                                        Grid.Row="1"
+                                                        LineBreakMode="TailTruncation"
+                                                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                                    Dark={StaticResource Gray400}}">
+                                                        <Label.Text>
+                                                            <MultiBinding StringFormat="{}{0} · {1}">
+                                                                <Binding Path="Source" />
+                                                                <Binding Path="Episode" />
+                                                            </MultiBinding>
+                                                        </Label.Text>
+                                                    </Label>
+                                                    <ProgressBar
+                                                        Grid.Column="0"
+                                                        Grid.Row="2"
+                                                        Margin="0,4,0,0"
+                                                        Progress="{Binding Progress, Mode=OneWay}"
+                                                        ProgressColor="{StaticResource Primary}" />
+                                                    <Label
+                                                        FontSize="11"
+                                                        Grid.Column="0"
+                                                        Grid.Row="3"
+                                                        Text="{Binding Status}"
+                                                        TextColor="{AppThemeBinding Light={StaticResource Outline},
+                                                                                    Dark={StaticResource Gray500}}" />
+                                                    <HorizontalStackLayout
+                                                        Grid.Column="1"
+                                                        Grid.Row="0"
+                                                        Grid.RowSpan="4"
+                                                        HorizontalOptions="Center"
+                                                        Spacing="4"
+                                                        VerticalOptions="Center">
+                                                        <ImageButton
+                                                            BackgroundColor="Transparent"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=CancelDownloadCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            HeightRequest="32"
+                                                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                                     Size=20,
+                                                                                     Color={AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                                                            Dark={StaticResource Gray400}},
+                                                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Stop}}"
+                                                            WidthRequest="32" />
+                                                        <ImageButton
+                                                            BackgroundColor="Transparent"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=DeleteDownloadCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            HeightRequest="32"
+                                                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                                     Size=20,
+                                                                                     Color={AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                                                            Dark={StaticResource Gray400}},
+                                                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Delete}}"
+                                                            WidthRequest="32" />
+                                                    </HorizontalStackLayout>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+
+                                <VerticalStackLayout
+                                    Grid.Row="0"
+                                    HorizontalOptions="Center"
+                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=HasDownloadingItems, Converter={StaticResource InvertedBoolConverter}}"
+                                    Margin="0,60,0,0"
+                                    Spacing="12"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        FontSize="48"
+                                        HorizontalOptions="Center"
+                                        Text="⬇️" />
+                                    <Label
+                                        FontSize="16"
+                                        HorizontalOptions="Center"
+                                        Text="暂无下载任务"
+                                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                    Dark={StaticResource Gray400}}" />
+                                    <Label
+                                        FontSize="13"
+                                        HorizontalOptions="Center"
+                                        Text="输入链接或从剧集页下载后将在此显示"
+                                        TextColor="{AppThemeBinding Light={StaticResource Outline},
+                                                                    Dark={StaticResource Gray500}}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </material:TabItem.ContentTemplate>
+                </material:TabItem>
+
+                <material:TabItem Title="下载完成">
+                    <material:TabItem.ContentTemplate>
+                        <DataTemplate>
+                            <Grid RowDefinitions="*">
+                                <CollectionView
+                                    Grid.Row="0"
+                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=HasDownloadedItems}"
+                                    ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=DownloadedItems}"
+                                    Margin="8,4">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="models:MediaDownload">
+                                            <Border
+                                                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                                                  Dark={StaticResource Gray900}}"
+                                                Margin="4,3"
+                                                Padding="12,10"
+                                                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                                                         Dark={StaticResource Gray600}}"
+                                                StrokeShape="RoundRectangle 10">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=PlayDownloadedCommand}" CommandParameter="{Binding}" />
+                                                </Border.GestureRecognizers>
+                                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                                                    <Label
+                                                        FontAttributes="Bold"
+                                                        FontSize="15"
+                                                        Grid.Column="0"
+                                                        Grid.Row="0"
+                                                        LineBreakMode="TailTruncation"
+                                                        Text="{Binding Name}"
+                                                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                                    Dark={StaticResource White}}" />
+                                                    <Label
+                                                        FontSize="12"
+                                                        Grid.Column="0"
+                                                        Grid.Row="1"
+                                                        LineBreakMode="TailTruncation"
+                                                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                                    Dark={StaticResource Gray400}}">
+                                                        <Label.Text>
+                                                            <MultiBinding StringFormat="{}{0} · {1}">
+                                                                <Binding Path="Source" />
+                                                                <Binding Path="Episode" />
+                                                            </MultiBinding>
+                                                        </Label.Text>
+                                                    </Label>
+                                                    <Label
+                                                        FontSize="11"
+                                                        Grid.Column="0"
+                                                        Grid.Row="2"
+                                                        Text="{Binding UpdateTime, Converter={StaticResource RelativeTimeConverter}}"
+                                                        TextColor="{AppThemeBinding Light={StaticResource Outline},
+                                                                                    Dark={StaticResource Gray500}}" />
+                                                    <HorizontalStackLayout
+                                                        Grid.Column="1"
+                                                        Grid.Row="0"
+                                                        Grid.RowSpan="3"
+                                                        HorizontalOptions="Center"
+                                                        Spacing="4"
+                                                        VerticalOptions="Center">
+                                                        <ImageButton
+                                                            BackgroundColor="Transparent"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=PlayDownloadedCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            HeightRequest="32"
+                                                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                                     Size=20,
+                                                                                     Color={StaticResource Primary},
+                                                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Play_circle}}"
+                                                            WidthRequest="32" />
+                                                        <ImageButton
+                                                            BackgroundColor="Transparent"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=DeleteDownloadCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            HeightRequest="32"
+                                                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                                     Size=20,
+                                                                                     Color={AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                                                            Dark={StaticResource Gray400}},
+                                                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Delete}}"
+                                                            WidthRequest="32" />
+                                                    </HorizontalStackLayout>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+
+                                <VerticalStackLayout
+                                    Grid.Row="0"
+                                    HorizontalOptions="Center"
+                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:DownloadViewModel}}, Path=HasDownloadedItems, Converter={StaticResource InvertedBoolConverter}}"
+                                    Margin="0,60,0,0"
+                                    Spacing="12"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        FontSize="48"
+                                        HorizontalOptions="Center"
+                                        Text="✅" />
+                                    <Label
+                                        FontSize="16"
+                                        HorizontalOptions="Center"
+                                        Text="暂无已下载内容"
+                                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                    Dark={StaticResource Gray400}}" />
+                                    <Label
+                                        FontSize="13"
+                                        HorizontalOptions="Center"
+                                        Text="下载完成的视频将在此显示，点击可播放"
+                                        TextColor="{AppThemeBinding Light={StaticResource Outline},
+                                                                    Dark={StaticResource Gray500}}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </material:TabItem.ContentTemplate>
+                </material:TabItem>
+
+            </material:TabView>
+        </Border>
+
+    </Grid>
 </uranium:UraniumContentPage>

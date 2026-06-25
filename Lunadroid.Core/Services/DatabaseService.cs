@@ -109,13 +109,14 @@ public class DatabaseService
 
     public async Task<PlayHistory?> GetPlayHistoryAsync(string vodId, string source, string name)
     {
-        return await _database.Table<PlayHistory>().Where(h => h.VodId == vodId && h.Source == source && h.Name == name).FirstOrDefaultAsync();
+        return await _database.Table<PlayHistory>().Where(h => h.VodId == vodId && h.Source == source && h.Name == name)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<List<PlayHistory>> GetPlayHistoriesByDateAsync(DateTime date)
     {
-        DateTime start = date.Date;
-        DateTime end = start.AddDays(1);
+        var start = date.Date;
+        var end = start.AddDays(1);
         return await _database.Table<PlayHistory>()
             .Where(h => h.UpdateTime >= start && h.UpdateTime < end)
             .OrderByDescending(h => h.UpdateTime)
@@ -125,7 +126,7 @@ public class DatabaseService
     public async Task<List<PlayHistory>> GetPlayHistoriesByMonthAsync(int year, int month)
     {
         var start = new DateTime(year, month, 1);
-        DateTime end = start.AddMonths(1);
+        var end = start.AddMonths(1);
         return await _database.Table<PlayHistory>()
             .Where(h => h.UpdateTime >= start && h.UpdateTime < end)
             .OrderByDescending(h => h.UpdateTime)
@@ -135,7 +136,7 @@ public class DatabaseService
     public async Task<List<PlayHistory>> GetPlayHistoriesByYearAsync(int year)
     {
         var start = new DateTime(year, 1, 1);
-        DateTime end = start.AddYears(1);
+        var end = start.AddYears(1);
         return await _database.Table<PlayHistory>()
             .Where(h => h.UpdateTime >= start && h.UpdateTime < end)
             .OrderByDescending(h => h.UpdateTime)
@@ -144,7 +145,7 @@ public class DatabaseService
 
     public async Task AddOrUpdatePlayHistoryAsync(PlayHistory history)
     {
-        PlayHistory? existing = await _database.Table<PlayHistory>()
+        var existing = await _database.Table<PlayHistory>()
             .Where(h => h.VodId == history.VodId && h.Name == history.Name && h.Source == history.Source)
             .FirstOrDefaultAsync();
 
@@ -192,6 +193,22 @@ public class DatabaseService
             .ToListAsync();
     }
 
+    public async Task<List<MediaDownload>> GetDownloadingRecordsAsync()
+    {
+        return await _database.Table<MediaDownload>()
+            .Where(r => !r.IsDownloaded)
+            .OrderByDescending(r => r.CreateTime)
+            .ToListAsync();
+    }
+
+    public async Task<List<MediaDownload>> GetDownloadedRecordsAsync()
+    {
+        return await _database.Table<MediaDownload>()
+            .Where(r => r.IsDownloaded)
+            .OrderByDescending(r => r.UpdateTime)
+            .ToListAsync();
+    }
+
     public async Task<MediaDownload?> GetDownloadRecordAsync(int id)
     {
         return await _database.Table<MediaDownload>().Where(r => r.Id == id).FirstOrDefaultAsync();
@@ -199,8 +216,8 @@ public class DatabaseService
 
     public async Task<List<MediaDownload>> GetDownloadRecordsByDateAsync(DateTime date)
     {
-        DateTime start = date.Date;
-        DateTime end = start.AddDays(1);
+        var start = date.Date;
+        var end = start.AddDays(1);
         return await _database.Table<MediaDownload>()
             .Where(r => r.CreateTime >= start && r.CreateTime < end)
             .OrderByDescending(r => r.CreateTime)
@@ -210,7 +227,7 @@ public class DatabaseService
     public async Task<List<MediaDownload>> GetDownloadRecordsByMonthAsync(int year, int month)
     {
         var start = new DateTime(year, month, 1);
-        DateTime end = start.AddMonths(1);
+        var end = start.AddMonths(1);
         return await _database.Table<MediaDownload>()
             .Where(r => r.CreateTime >= start && r.CreateTime < end)
             .OrderByDescending(r => r.CreateTime)
@@ -220,7 +237,7 @@ public class DatabaseService
     public async Task<List<MediaDownload>> GetDownloadRecordsByYearAsync(int year)
     {
         var start = new DateTime(year, 1, 1);
-        DateTime end = start.AddYears(1);
+        var end = start.AddYears(1);
         return await _database.Table<MediaDownload>()
             .Where(r => r.CreateTime >= start && r.CreateTime < end)
             .OrderByDescending(r => r.CreateTime)
@@ -229,7 +246,7 @@ public class DatabaseService
 
     public async Task<List<MediaDownload>> SearchDownloadRecordsAsync(string keyword)
     {
-        string trimmed = keyword.Trim();
+        var trimmed = keyword.Trim();
         return await _database.Table<MediaDownload>()
             .Where(r => r.Name.Contains(trimmed) ||
                         r.Source.Contains(trimmed) ||
