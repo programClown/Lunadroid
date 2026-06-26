@@ -1,5 +1,4 @@
-﻿using System.Text;
-using N_m3u8DL_RE.Common.Entity;
+﻿using N_m3u8DL_RE.Common.Entity;
 using N_m3u8DL_RE.Common.Enum;
 using N_m3u8DL_RE.Common.Log;
 using N_m3u8DL_RE.Common.Resource;
@@ -11,14 +10,17 @@ using N_m3u8DL_RE.Parser;
 using N_m3u8DL_RE.Parser.Config;
 using N_m3u8DL_RE.Processor;
 using N_m3u8DL_RE.Util;
+using System.Text;
 
 namespace M3U8Download;
 
 public class DownloadManager
 {
-    public Dictionary<int, DownloadStatus> DownloadStatus { get; private set; } = new Dictionary<int, DownloadStatus>();
+    public Dictionary<int, DownloadStatus> DownloadStatus { get; } = new();
 
-    private static bool HttpConfigured { get; set; } = false;
+    private static bool HttpConfigured { get; set; }
+
+    public string ExternalPath { get; set; }
     
     public DownloadOption? Option { get; } = new()
     {
@@ -47,7 +49,7 @@ public class DownloadManager
         MP4RealTimeDecryption = false,
         DecryptionEngine = DecryptEngine.MP4DECRYPT,
         DecryptionBinaryPath = null,
-        FFmpegBinaryPath = null,
+        // FFmpegBinaryPath = null,
         BaseUrl = null,
         ConcurrentDownload = false,
         NoLog = false,
@@ -91,14 +93,8 @@ public class DownloadManager
     {
         if (streamSpec.Channels == null) return 0;
 
-        var str = streamSpec.Channels.Split('/')[0];
-        return int.TryParse(str, out var order) ? order : 0;
-    }
-
-    public void SetFFmpegPath(string ffmpegPath)
-    {
-        if (Option == null) return;
-        Option.FFmpegBinaryPath = ffmpegPath;
+        string str = streamSpec.Channels.Split('/')[0];
+        return int.TryParse(str, out int order) ? order : 0;
     }
 
     public async Task<bool> DownloadAsync(string url, string savePath, string saveName)
@@ -108,17 +104,19 @@ public class DownloadManager
         Option.Input = url;
         Option.SaveDir = savePath;
         Option.SaveName = saveName;
-        
+
         if (!HttpConfigured)
+        {
             HTTPUtil.AppHttpClient.Timeout = TimeSpan.FromSeconds(Option.HttpRequestTimeout);
-        
+        }
+
 
         Logger.IsWriteFile = !Option.NoLog;
-        Logger.LogFilePath = Option.LogFilePath;
+        Logger.LogFilePath = Option.LogFilePath ?? Path.Combine(ExternalPath, "logs");
         Logger.InitLogFile();
         Logger.LogLevel = Option.LogLevel;
 
-        if (Option.UseSystemProxy == false && !HttpConfigured) HTTPUtil.HttpClientHandler.UseProxy = false;
+        if (!Option.UseSystemProxy && !HttpConfigured) HTTPUtil.HttpClientHandler.UseProxy = false;
 
         if (Option.CustomProxy != null && !HttpConfigured)
         {
@@ -128,7 +126,9 @@ public class DownloadManager
 
         // 检查互斥的选项
         if (Option is { MuxAfterDone: false, MuxImports.Count: > 0 })
+        {
             throw new ArgumentException("MuxAfterDone disabled, MuxImports not allowed!");
+        }
 
         // LivePipeMux开启时 LiveRealTimeMerge必须开启
         if (Option is { LivePipeMux: true, LiveRealTimeMerge: false })
@@ -138,19 +138,23 @@ public class DownloadManager
         }
 
         // 预先检查ffmpeg
-        Option.FFmpegBinaryPath ??= GlobalUtil.FindExecutable("ffmpeg");
-
-        if (string.IsNullOrEmpty(Option.FFmpegBinaryPath) || !File.Exists(Option.FFmpegBinaryPath))
-            throw new FileNotFoundException(ResString.ffmpegNotFound);
-
-        Logger.Extra($"ffmpeg => {Option.FFmpegBinaryPath}");
+        // Option.FFmpegBinaryPath ??= GlobalUtil.FindExecutable("ffmpeg");
+        //
+        // if (string.IsNullOrEmpty(Option.FFmpegBinaryPath) || !File.Exists(Option.FFmpegBinaryPath))
+        // {
+        //     throw new FileNotFoundException(ResString.ffmpegNotFound);
+        // }
+        //
+        // Logger.Extra($"ffmpeg => {Option.FFmpegBinaryPath}");
 
         // 预先检查mkvmerge
         if (Option is { MuxOptions.UseMkvmerge: true, MuxAfterDone: true })
         {
             Option.MkvmergeBinaryPath ??= GlobalUtil.FindExecutable("mkvmerge");
             if (string.IsNullOrEmpty(Option.MkvmergeBinaryPath) || !File.Exists(Option.MkvmergeBinaryPath))
+            {
                 throw new FileNotFoundException(ResString.mkvmergeNotFound);
+            }
             Logger.Extra($"mkvmerge => {Option.MkvmergeBinaryPath}");
         }
 
@@ -158,32 +162,38 @@ public class DownloadManager
         if (Option.Keys is { Length: > 0 } || Option.KeyTextFile != null)
         {
             if (!string.IsNullOrEmpty(Option.DecryptionBinaryPath) && !File.Exists(Option.DecryptionBinaryPath))
+            {
                 throw new FileNotFoundException(Option.DecryptionBinaryPath);
+            }
             switch (Option.DecryptionEngine)
             {
                 case DecryptEngine.SHAKA_PACKAGER:
                 {
-                    var file = GlobalUtil.FindExecutable("shaka-packager");
-                    var file2 = GlobalUtil.FindExecutable("packager-linux-x64");
-                    var file3 = GlobalUtil.FindExecutable("packager-osx-x64");
-                    var file4 = GlobalUtil.FindExecutable("packager-win-x64");
+                    string? file = GlobalUtil.FindExecutable("shaka-packager");
+                    string? file2 = GlobalUtil.FindExecutable("packager-linux-x64");
+                    string? file3 = GlobalUtil.FindExecutable("packager-osx-x64");
+                    string? file4 = GlobalUtil.FindExecutable("packager-win-x64");
                     if (file == null && file2 == null && file3 == null && file4 == null)
+                    {
                         throw new FileNotFoundException(ResString.shakaPackagerNotFound);
+                    }
                     Option.DecryptionBinaryPath = file ?? file2 ?? file3 ?? file4;
                     Logger.Extra($"shaka-packager => {Option.DecryptionBinaryPath}");
                     break;
                 }
+
                 case DecryptEngine.MP4DECRYPT:
                 {
-                    var file = GlobalUtil.FindExecutable("mp4decrypt");
+                    string? file = GlobalUtil.FindExecutable("mp4decrypt");
                     if (file == null) throw new FileNotFoundException(ResString.mp4decryptNotFound);
                     Option.DecryptionBinaryPath = file;
                     Logger.Extra($"mp4decrypt => {Option.DecryptionBinaryPath}");
                     break;
                 }
+
                 case DecryptEngine.FFMPEG:
                 default:
-                    Option.DecryptionBinaryPath = Option.FFmpegBinaryPath;
+                    // Option.DecryptionBinaryPath = Option.FFmpegBinaryPath;
                     break;
             }
         }
@@ -226,12 +236,15 @@ public class DownloadManager
         if (Option.TaskStartAt != null && Option.TaskStartAt > DateTime.Now)
         {
             Logger.InfoMarkUp(ResString.taskStartAt + Option.TaskStartAt);
-            while (Option.TaskStartAt > DateTime.Now) await Task.Delay(1000);
+            while (Option.TaskStartAt > DateTime.Now)
+            {
+                await Task.Delay(1000);
+            }
         }
 
         // 流提取器配置
         var extractor = new StreamExtractor(parserConfig);
-        
+
         try
         {
             // 从链接加载内容
@@ -252,7 +265,7 @@ public class DownloadManager
             };
             return false;
         }
-        
+
         // 解析流信息
         var streams = await extractor.ExtractStreamsAsync();
 
@@ -271,7 +284,7 @@ public class DownloadManager
         if (string.IsNullOrEmpty(Option.SaveName)) Option.SaveName = OtherUtil.GetFileNameFromInput(Option.Input);
 
         // 生成文件夹
-        var tmpDir = Path.Combine(Option.TmpDir ?? Environment.CurrentDirectory,
+        string tmpDir = Path.Combine(ExternalPath,
             $"{Option.SaveName ?? DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}");
         // 记录文件
         extractor.RawFiles["meta.json"] = GlobalUtil.ConvertToJson(lists);
@@ -280,7 +293,10 @@ public class DownloadManager
 
         Logger.Info(ResString.streamsInfo, lists.Count, basicStreams.Count, audios.Count, subs.Count);
 
-        foreach (var item in lists) Logger.InfoMarkUp(item.ToString());
+        foreach (StreamSpec item in lists)
+        {
+            Logger.InfoMarkUp(item.ToString());
+        }
 
         var selectedStreams = new List<StreamSpec>();
         if (Option.DropVideoFilter != null || Option.DropAudioFilter != null || Option.DropSubtitleFilter != null)
@@ -301,11 +317,15 @@ public class DownloadManager
         if (Option.AutoSelect)
         {
             if (basicStreams.Count != 0)
+            {
                 selectedStreams.Add(basicStreams.First());
+            }
             var langs = audios.DistinctBy(a => a.Language).Select(a => a.Language);
-            foreach (var lang in langs)
+            foreach (string? lang in langs)
+            {
                 selectedStreams.Add(audios.Where(a => a.Language == lang).OrderByDescending(a => a.Bandwidth)
                     .ThenByDescending(GetOrder).First());
+            }
             selectedStreams.AddRange(subs);
         }
         else if (Option.SubOnly)
@@ -326,16 +346,21 @@ public class DownloadManager
         }
 
         if (selectedStreams.Count == 0)
+        {
             throw new Exception(ResString.noStreamsToDownload);
+        }
 
         // HLS: 选中流中若有没加载出playlist的，加载playlist
         // DASH/MSS: 加载playlist (调用url预处理器)
-        if (selectedStreams.Any(s => s.Playlist == null) || extractor.ExtractorType == ExtractorType.MPEG_DASH ||
+        if (selectedStreams.Any(s => s.Playlist == null) ||
+            extractor.ExtractorType == ExtractorType.MPEG_DASH ||
             extractor.ExtractorType == ExtractorType.MSS)
+        {
             await extractor.FetchPlayListAsync(selectedStreams);
+        }
 
         // 直播检测
-        var livingFlag = selectedStreams.Any(s => s.Playlist?.IsLive == true) && !Option.LivePerformAsVod;
+        bool livingFlag = selectedStreams.Any(s => s.Playlist?.IsLive == true) && !Option.LivePerformAsVod;
         if (livingFlag) Logger.WarnMarkUp($"[white on darkorange3_1]{ResString.liveFound}[/]");
 
         // 无法识别的加密方式，自动开启二进制合并
@@ -349,7 +374,9 @@ public class DownloadManager
 
         // 应用用户自定义的分片范围
         if (!livingFlag)
+        {
             FilterUtil.ApplyCustomRange(selectedStreams, Option.CustomRange);
+        }
 
         // 应用用户自定义的广告分片关键字
         FilterUtil.CleanAd(selectedStreams, Option.AdKeywords);
@@ -358,7 +385,10 @@ public class DownloadManager
         extractor.RawFiles["meta_selected.json"] = GlobalUtil.ConvertToJson(selectedStreams);
 
         Logger.Info(ResString.selectedStream);
-        foreach (var item in selectedStreams) Logger.InfoMarkUp(item.ToString());
+        foreach (StreamSpec item in selectedStreams)
+        {
+            Logger.InfoMarkUp(item.ToString());
+        }
 
         // 写出文件
         await WriteRawFilesAsync(Option, extractor, tmpDir);
@@ -413,7 +443,7 @@ public class DownloadManager
             Logger.Warn(ResString.writeJson);
             foreach (var item in extractor.RawFiles)
             {
-                var file = Path.Combine(tmpDir, item.Key);
+                string file = Path.Combine(tmpDir, item.Key);
                 if (!File.Exists(file)) await File.WriteAllTextAsync(file, item.Value, Encoding.UTF8);
             }
         }

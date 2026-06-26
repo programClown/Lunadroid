@@ -43,7 +43,7 @@ internal static partial class MediainfoUtil
         if (string.IsNullOrEmpty(file) || !File.Exists(file)) return result;
 
         string cmd = "-hide_banner -i \"" + file + "\"";
-        var p = Process.Start(new ProcessStartInfo()
+        Process p = Process.Start(new ProcessStartInfo
         {
             FileName = binary,
             Arguments = cmd,
@@ -52,16 +52,16 @@ internal static partial class MediainfoUtil
             UseShellExecute = false,
             CreateNoWindow = true
         })!;
-        var output = await p.StandardError.ReadToEndAsync();
+        string output = await p.StandardError.ReadToEndAsync();
         await p.WaitForExitAsync();
 
         foreach (Match stream in TextRegex().Matches(output))
         {
-            var info = new Mediainfo()
+            var info = new Mediainfo
             {
                 Text = TypeRegex().Match(stream.Value).Groups[2].Value.TrimEnd(),
                 Id = IdRegex().Match(stream.Value).Groups[1].Value,
-                Type = TypeRegex().Match(stream.Value).Groups[1].Value,
+                Type = TypeRegex().Match(stream.Value).Groups[1].Value
             };
 
             info.Resolution = ResRegex().Match(info.Text).Value;
@@ -71,19 +71,19 @@ internal static partial class MediainfoUtil
             info.BaseInfo = ReplaceRegex().Replace(info.BaseInfo, "");
             info.HDR = info.Text.Contains("/bt2020/");
 
-            if (info.BaseInfo.Contains("dvhe")
-                || info.BaseInfo.Contains("dvh1")
-                || info.BaseInfo.Contains("DOVI")
-                || info.Type.Contains("dvvideo")
-                || (DoViRegex().IsMatch(output) && info.Type == "Video")
+            if (info.BaseInfo.Contains("dvhe") || info.BaseInfo.Contains("dvh1") || info.BaseInfo.Contains("DOVI") || info.Type.Contains("dvvideo") || DoViRegex().IsMatch(output) && info.Type == "Video"
                )
+            {
                 info.DolbyVison = true;
+            }
 
             if (StartRegex().IsMatch(output))
             {
-                var f = StartRegex().Match(output).Groups[1].Value;
-                if (double.TryParse(f, out var d))
+                string f = StartRegex().Match(output).Groups[1].Value;
+                if (double.TryParse(f, out double d))
+                {
                     info.StartTime = TimeSpan.FromSeconds(d);
+                }
             }
 
             result.Add(info);
@@ -98,5 +98,15 @@ internal static partial class MediainfoUtil
         }
 
         return result;
+    }
+
+    public static async Task<List<Mediainfo>> ReadInfoAsync(string file)
+    {
+        if (string.IsNullOrEmpty(file) || !File.Exists(file))
+        {
+            return [new Mediainfo { Type = "Unknown" }];
+        }
+
+        return await Task.Run(() => FFmpegProbe.Probe(file));
     }
 }

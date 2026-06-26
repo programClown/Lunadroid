@@ -1,8 +1,8 @@
-﻿using System.Net;
-using N_m3u8DL_RE.Common.Enum;
+﻿using N_m3u8DL_RE.Common.Enum;
 using N_m3u8DL_RE.Common.Log;
 using N_m3u8DL_RE.Entity;
 using N_m3u8DL_RE.Enum;
+using System.Net;
 
 namespace M3U8Download;
 
@@ -252,7 +252,7 @@ public class DownloadOption
     /// <summary>
     ///     See: <see cref="CommandInvoker.FFmpegBinaryPath" />.
     /// </summary>
-    public string? FFmpegBinaryPath { get; set; }
+    // public string? FFmpegBinaryPath { get; set; }
 
     /// <summary>
     ///     See: <see cref="CommandInvoker.MkvmergeBinaryPath" />.
