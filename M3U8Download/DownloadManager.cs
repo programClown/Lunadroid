@@ -49,7 +49,7 @@ public class DownloadManager
         MP4RealTimeDecryption = false,
         DecryptionEngine = DecryptEngine.MP4DECRYPT,
         DecryptionBinaryPath = null,
-        // FFmpegBinaryPath = null,
+        FFmpegBinaryPath = null,
         BaseUrl = null,
         ConcurrentDownload = false,
         NoLog = false,
@@ -97,6 +97,12 @@ public class DownloadManager
         return int.TryParse(str, out int order) ? order : 0;
     }
 
+    public void SetFFmpegPath(string ffmpegPath)
+    {
+        if (Option == null) return;
+        Option.FFmpegBinaryPath = ffmpegPath;
+    }
+    
     public async Task<bool> DownloadAsync(string url, string savePath, string saveName)
     {
         if (Option == null) return false;
@@ -138,14 +144,14 @@ public class DownloadManager
         }
 
         // 预先检查ffmpeg
-        // Option.FFmpegBinaryPath ??= GlobalUtil.FindExecutable("ffmpeg");
-        //
-        // if (string.IsNullOrEmpty(Option.FFmpegBinaryPath) || !File.Exists(Option.FFmpegBinaryPath))
-        // {
-        //     throw new FileNotFoundException(ResString.ffmpegNotFound);
-        // }
-        //
-        // Logger.Extra($"ffmpeg => {Option.FFmpegBinaryPath}");
+        Option.FFmpegBinaryPath ??= GlobalUtil.FindExecutable("ffmpeg");
+        
+        if (string.IsNullOrEmpty(Option.FFmpegBinaryPath) || !File.Exists(Option.FFmpegBinaryPath))
+        {
+            throw new FileNotFoundException(ResString.ffmpegNotFound);
+        }
+        
+        Logger.Extra($"ffmpeg => {Option.FFmpegBinaryPath}");
 
         // 预先检查mkvmerge
         if (Option is { MuxOptions.UseMkvmerge: true, MuxAfterDone: true })
@@ -193,7 +199,7 @@ public class DownloadManager
 
                 case DecryptEngine.FFMPEG:
                 default:
-                    // Option.DecryptionBinaryPath = Option.FFmpegBinaryPath;
+                    Option.DecryptionBinaryPath = Option.FFmpegBinaryPath;
                     break;
             }
         }

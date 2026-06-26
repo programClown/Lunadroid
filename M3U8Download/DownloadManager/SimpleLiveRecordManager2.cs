@@ -235,8 +235,7 @@ internal class SimpleLiveRecordManager2
                     if (!readInfo)
                     {
                         Logger.WarnMarkUp(ResString.readingInfo);
-                        // mediaInfos = await MediainfoUtil.ReadInfoAsync(DownloaderConfig.MyOptions.FFmpegBinaryPath!, result.ActualFilePath);
-                        mediaInfos = await MediainfoUtil.ReadInfoAsync(result.ActualFilePath);
+                        mediaInfos = await MediainfoUtil.ReadInfoAsync(DownloaderConfig.MyOptions.FFmpegBinaryPath!, result.ActualFilePath);
                         mediaInfos.ForEach(info => Logger.InfoMarkUp(info.ToStringMarkUp()));
                         lock (lockObj)
                         {
@@ -316,8 +315,7 @@ internal class SimpleLiveRecordManager2
                     {
                         // ffmpeg读取信息
                         Logger.WarnMarkUp(ResString.readingInfo);
-                        // mediaInfos = await MediainfoUtil.ReadInfoAsync(DownloaderConfig.MyOptions.FFmpegBinaryPath!, result!.ActualFilePath);
-                        mediaInfos = await MediainfoUtil.ReadInfoAsync(result!.ActualFilePath);
+                        mediaInfos = await MediainfoUtil.ReadInfoAsync(DownloaderConfig.MyOptions.FFmpegBinaryPath!, result!.ActualFilePath);
                         mediaInfos.ForEach(info => Logger.InfoMarkUp(info.ToStringMarkUp()));
                         lock (lockObj)
                         {
@@ -905,8 +903,7 @@ internal class SimpleLiveRecordManager2
             Logger.WarnMarkUp($"Muxing to [grey]{outName.EscapeMarkup()}{ext}[/]");
             var result = false;
             if (DownloaderConfig.MyOptions.MuxOptions.UseMkvmerge) result = MergeUtil.MuxInputsByMkvmerge(DownloaderConfig.MyOptions.MkvmergeBinaryPath!, OutputFiles.ToArray(), outPath);
-            // else result = MergeUtil.MuxInputsByFFmpeg(DownloaderConfig.MyOptions.FFmpegBinaryPath!, OutputFiles.ToArray(), outPath, DownloaderConfig.MyOptions.MuxOptions.MuxFormat, !DownloaderConfig.MyOptions.NoDateInfo);
-            else result = MergeUtil.MuxInputsByFFmpeg(OutputFiles.ToArray(), outPath, DownloaderConfig.MyOptions.MuxOptions.MuxFormat, !DownloaderConfig.MyOptions.NoDateInfo);
+            else result = MergeUtil.MuxInputsByFFmpeg(DownloaderConfig.MyOptions.FFmpegBinaryPath!, OutputFiles.ToArray(), outPath, DownloaderConfig.MyOptions.MuxOptions.MuxFormat, !DownloaderConfig.MyOptions.NoDateInfo);
             // 完成后删除各轨道文件
             if (result)
             {

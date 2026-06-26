@@ -99,14 +99,4 @@ internal static partial class MediainfoUtil
 
         return result;
     }
-
-    public static async Task<List<Mediainfo>> ReadInfoAsync(string file)
-    {
-        if (string.IsNullOrEmpty(file) || !File.Exists(file))
-        {
-            return [new Mediainfo { Type = "Unknown" }];
-        }
-
-        return await Task.Run(() => FFmpegProbe.Probe(file));
-    }
 }

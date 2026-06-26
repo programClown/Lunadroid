@@ -252,7 +252,7 @@ public class DownloadOption
     /// <summary>
     ///     See: <see cref="CommandInvoker.FFmpegBinaryPath" />.
     /// </summary>
-    // public string? FFmpegBinaryPath { get; set; }
+    public string? FFmpegBinaryPath { get; set; }
 
     /// <summary>
     ///     See: <see cref="CommandInvoker.MkvmergeBinaryPath" />.

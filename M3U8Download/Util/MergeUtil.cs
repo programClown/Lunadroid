@@ -199,54 +199,6 @@ internal static class MergeUtil
         return code == 0;
     }
 
-    public static bool MergeByFFmpeg(string[] files, string outputPath, string muxFormat, bool useAACFilter,
-        bool fastStart = false,
-        bool writeDate = true, bool useConcatDemuxer = false, string poster = "", string audioName = "", string title = "",
-        string copyright = "", string comment = "", string encodingTool = "", string recTime = "")
-    {
-        outputPath = Path.GetFullPath(outputPath);
-
-        string dateString = string.IsNullOrEmpty(recTime) ? DateTime.Now.ToString("o") : recTime;
-        string ddpAudio = File.Exists($"{Path.GetFileNameWithoutExtension(outputPath + ".mp4")}.txt")
-            ? File.ReadAllText($"{Path.GetFileNameWithoutExtension(outputPath + ".mp4")}.txt")
-            : "";
-        if (!string.IsNullOrEmpty(ddpAudio)) useAACFilter = false;
-
-        string ext = muxFormat.ToUpper() switch
-        {
-            "MP4" => ".mp4",
-            "MKV" => ".mkv",
-            "FLV" => ".flv",
-            "TS" => ".ts",
-            "M4A" => ".m4a",
-            "EAC3" => ".eac3",
-            "AAC" => ".m4a",
-            "AC3" => ".ac3",
-            _ => $".{muxFormat.ToLower()}"
-        };
-        string outputFile = outputPath + ext;
-
-        var allInputs = new List<string>(files);
-        if (!string.IsNullOrEmpty(poster) && File.Exists(poster))
-        {
-            allInputs.Add(poster);
-        }
-        if (!string.IsNullOrEmpty(ddpAudio) && File.Exists(ddpAudio))
-        {
-            allInputs.Add(ddpAudio);
-        }
-
-        Logger.DebugMarkUp($"FFmpegRemuxer: merging {files.Length} files -> {outputFile}");
-
-        bool success = FFmpegRemuxer.ConcatMerge(
-            allInputs.ToArray(), outputFile, muxFormat,
-            useAACFilter, fastStart, writeDate,
-            poster, ddpAudio, audioName, title,
-            copyright, comment, encodingTool, dateString);
-
-        return success;
-    }
-
     public static bool MuxInputsByFFmpeg(string binary, OutputFile[] files, string outputPath, MuxFormat muxFormat, bool dateinfo)
     {
         string ext = OtherUtil.GetMuxExtension(muxFormat);
@@ -337,60 +289,7 @@ internal static class MergeUtil
 
         return code == 0;
     }
-
-
-    public static bool MuxInputsByFFmpeg(OutputFile[] files, string outputPath, MuxFormat muxFormat, bool dateinfo)
-    {
-        string ext = OtherUtil.GetMuxExtension(muxFormat);
-        string dateString = DateTime.Now.ToString("o");
-
-        string[] inputPaths = files.Select(f => f.FilePath).ToArray();
-
-        string[][] streamLangs = new string[files.Length][];
-        string[][] streamTitles = new string[files.Length][];
-        int[][] streamDispositions = new int[files.Length][];
-
-        bool[] srtFlags = new bool[files.Length];
-        var mediaTypes = new MediaType?[files.Length];
-
-        for (int i = 0; i < files.Length; i++)
-        {
-            LanguageCodeUtil.ConvertLangCodeAndDisplayName(files[i]);
-            int count = files[i].Mediainfos.Count > 0 ? files[i].Mediainfos.Count : 1;
-            streamLangs[i] = new string[count];
-            streamTitles[i] = new string[count];
-            streamDispositions[i] = new int[count];
-
-            for (int j = 0; j < count; j++)
-            {
-                streamLangs[i][j] = files[i].LangCode ?? "und";
-                streamTitles[i][j] = files[i].Description ?? "";
-            }
-
-            srtFlags[i] = files[i].FilePath.EndsWith(".srt");
-            mediaTypes[i] = files[i].MediaType;
-        }
-
-        string muxFmtStr = muxFormat switch
-        {
-            MuxFormat.MP4 => "MP4",
-            MuxFormat.TS => "TS",
-            MuxFormat.MKV => "MKV",
-            _ => "MP4"
-        };
-
-        Logger.DebugMarkUp($"FFmpegRemuxer: muxing {files.Length} inputs -> {outputPath}{ext}");
-
-        bool success = FFmpegRemuxer.MuxStreams(
-            inputPaths, outputPath + ext, muxFmtStr,
-            dateinfo, dateString,
-            streamLangs, streamTitles, streamDispositions,
-            mediaTypes,
-            srtFlags);
-
-        return success;
-    }
-
+    
     public static bool MuxInputsByMkvmerge(string binary, OutputFile[] files, string outputPath)
     {
         var command = new StringBuilder($"-q --output \"{outputPath}.mkv\" ");

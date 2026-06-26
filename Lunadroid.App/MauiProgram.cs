@@ -1,7 +1,4 @@
 ﻿using CommunityToolkit.Maui;
-using FFmpeg.AutoGen;
-using FFmpeg.AutoGen.Native;
-using Java.Lang;
 using Lunadroid.App.Services;
 using Lunadroid.App.ViewModels;
 using Lunadroid.Core.Api;
@@ -10,7 +7,6 @@ using Refit;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using UraniumUI;
-using Application = Android.App.Application;
 using Environment = Android.OS.Environment;
 using File = Java.IO.File;
 
@@ -37,21 +33,6 @@ public static class MauiProgram
 
         builder.Services.AddCommunityToolkitDialogs();
 
-#if ANDROID
-        string? nativeLibDir = Application.Context.ApplicationInfo.NativeLibraryDir;
-        Logger.Debug($"Native library dir: {nativeLibDir}");
-        DynamicallyLoadedBindings.FunctionResolver = new LinuxFunctionResolver();
-        //try
-        //{
-        //    ffmpeg.RootPath = nativeLibDir;
-        //}
-        //catch { }
-        JavaSystem.LoadLibrary("c");
-        ffmpeg.RootPath = nativeLibDir;
-        DynamicallyLoadedBindings.FunctionResolver = new AndroidFunctionResolver();
-        DynamicallyLoadedBindings.ThrowErrorIfFunctionNotFound = true;
-        DynamicallyLoadedBindings.Initialize();
-#endif
         // Database
         File? publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
         string dbPath = Path.Combine(publicDir!.AbsolutePath, "com.lunadroid.app", "lunadroid.db");
