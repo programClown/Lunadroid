@@ -50,6 +50,8 @@
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
+
+
     </ItemGroup>
 
     <ItemGroup>
@@ -61,6 +63,16 @@
         <PackageReference Include="UraniumUI.Material" Version="$(UraniumUIVersion)"/>
         <PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="$(UraniumUIVersion)"/>
         <PackageReference Include="UraniumUI.Dialogs.CommunityToolkit" Version="$(UraniumUIVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AndroidNativeLibrary Include="Platforms\Android\lib\arm64-v8a\libavcodec.so"/>
+        <AndroidNativeLibrary Include="Platforms\Android\lib\arm64-v8a\libavdevice.so"/>
+        <AndroidNativeLibrary Include="Platforms\Android\lib\arm64-v8a\libavfilter.so"/>
+        <AndroidNativeLibrary Include="Platforms\Android\lib\arm64-v8a\libavformat.so"/>
+        <AndroidNativeLibrary Include="Platforms\Android\lib\arm64-v8a\libavutil.so"/>
+        <AndroidNativeLibrary Include="Platforms\Android\lib\arm64-v8a\libswresample.so"/>
+        <AndroidNativeLibrary Include="Platforms\Android\lib\arm64-v8a\libswscale.so"/>
     </ItemGroup>
 
     <ItemGroup>
