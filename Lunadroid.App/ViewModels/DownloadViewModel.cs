@@ -1,11 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Java.Lang;
 using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
-using M3U8Download;
-using UraniumUI.Extensions;
 using Environment = Android.OS.Environment;
+using Exception = System.Exception;
 
 namespace Lunadroid.App.ViewModels;
 
@@ -35,26 +35,17 @@ public partial class DownloadViewModel : BaseViewModel
         var ffmpegSourcePath = "/data/local/tmp/ffmpeg";
 
         // chmod 755 赋予执行权限
-        using var chmodProcess = Java.Lang.Runtime.GetRuntime()!.Exec($"chmod 755 {ffmpegSourcePath}");
+        using var chmodProcess = Runtime.GetRuntime()!.Exec($"chmod 755 {ffmpegSourcePath}");
         chmodProcess.WaitFor();
 
         return ffmpegSourcePath;
     }
-    
+
     public async Task LoadDownloadsAsync()
     {
         if (IsBusy) return;
         IsBusy = true;
 
-        await Task.Run(async () =>
-        {
-            var downloadManager = new DownloadManager();
-            var ffmpegPath = EnsureFfmpegExecutable();
-            downloadManager.SetFFmpegPath(ffmpegPath);
-            downloadManager.ExternalPath = Path.Combine(Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments)!.AbsolutePath, "m3u8");
-            await downloadManager.DownloadAsync("https://vod.360zyx.vip/20250708/7T2xjBRd/index.m3u8", Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments)!.AbsolutePath, "曼达洛人");
-        }).ConfigureAwait(false);
-        
         try
         {
             var downloadingList = await _databaseService.GetDownloadingRecordsAsync();
