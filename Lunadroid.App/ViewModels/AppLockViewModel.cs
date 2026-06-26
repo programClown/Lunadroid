@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
 
 namespace Lunadroid.App.ViewModels;
@@ -32,9 +33,9 @@ public partial class AppLockViewModel : BaseViewModel
     public AppLockViewModel(AppConfigService configService)
     {
         _configService = configService;
-        var config = configService.Config;
+        AppConfig config = configService.Config;
         IsVerifying = config.SecurityLockEnabled && !string.IsNullOrEmpty(config.PinCode);
-        IsSetup = !config.SecurityLockEnabled;
+        IsSetup = !IsVerifying;
 
         if (IsVerifying)
         {

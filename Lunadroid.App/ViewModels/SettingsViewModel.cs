@@ -1,11 +1,12 @@
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Lunadroid.App.ViewModels;
 
@@ -80,11 +81,10 @@ public partial class SettingsViewModel : BaseViewModel
 
     private void LoadConfigFromService()
     {
-        var c = _appConfigService.Config;
+        AppConfig c = _appConfigService.Config;
         ForceApiNeedSpecialSource = c.ForceApiNeedSpecialSource;
         IsSecurityLockEnabled = c.SecurityLockEnabled;
         Autoplay = c.Autoplay;
-        CloudSourceUrl = c.CloudSourceUrl;
     }
 
     private void SaveConfigToService()
@@ -127,7 +127,7 @@ public partial class SettingsViewModel : BaseViewModel
         {
             var sources = await _databaseService.GetApiSourcesAsync();
             ApiSourceItems.Clear();
-            foreach (var s in sources)
+            foreach (ApiSource s in sources)
             {
                 ApiSourceItems.Add(new ApiSourceItem
                 {
@@ -147,9 +147,14 @@ public partial class SettingsViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void ResetPinCode()
+    private async Task ResetPinCodeAsync()
     {
-        _appConfigService.UpdateConfig(c => { c.PinCode = null; });
+        _appConfigService.UpdateConfig(c =>
+        {
+            c.PinCode = null;
+        });
+
+        await Toast.Make("PIN码已重置成功").Show();
     }
 
 
@@ -162,14 +167,14 @@ public partial class SettingsViewModel : BaseViewModel
 
         try
         {
-            var url = string.IsNullOrWhiteSpace(CloudSourceUrl)
+            string url = string.IsNullOrWhiteSpace(CloudSourceUrl)
                 ? "https://pz.v88.qzz.io?format=0&source=jin18"
                 : CloudSourceUrl;
 
-            var response = await _httpClient.GetAsync(url);
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var jsonString = await response.Content.ReadAsStringAsync();
+                string jsonString = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"Response: {jsonString}");
 
                 // 解析JSON响应
@@ -182,7 +187,7 @@ public partial class SettingsViewModel : BaseViewModel
                 {
                     var cloudApiSources = new List<ApiSource>();
                     // 处理云端数据
-                    foreach (var (source, site) in cloudData.ApiSite)
+                    foreach ((string source, CloudApiSite site) in cloudData.ApiSite)
                     {
                         cloudApiSources.Add(new ApiSource
                         {
@@ -243,7 +248,7 @@ public partial class SettingsViewModel : BaseViewModel
         IsImporting = true;
         try
         {
-            var result = await FilePicker.Default.PickAsync(new PickOptions
+            FileResult? result = await FilePicker.Default.PickAsync(new PickOptions
             {
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
@@ -254,12 +259,12 @@ public partial class SettingsViewModel : BaseViewModel
 
             if (result == null) return;
 
-            await using var stream = await result.OpenReadAsync();
+            await using Stream stream = await result.OpenReadAsync();
             using var reader = new StreamReader(stream);
-            var json = await reader.ReadToEndAsync();
+            string json = await reader.ReadToEndAsync();
 
             List<ApiSource> sources;
-            var trimmed = json.Trim();
+            string trimmed = json.Trim();
             if (trimmed.StartsWith("["))
             {
                 sources = JsonSerializer.Deserialize<List<ApiSource>>(json, JsonOpts) ?? [];
@@ -269,8 +274,8 @@ public partial class SettingsViewModel : BaseViewModel
                 sources = JsonSerializer.Deserialize<List<ApiSource>>(json, JsonOpts) ?? [];
             }
 
-            var added = 0;
-            foreach (var source in sources)
+            int added = 0;
+            foreach (ApiSource source in sources)
             {
                 if (string.IsNullOrWhiteSpace(source.ApiBaseUrl)) continue;
                 source.IsAdult = source.Name.Contains("🔞") || source.IsAdult;
@@ -308,9 +313,9 @@ public partial class SettingsViewModel : BaseViewModel
                 return;
             }
 
-            var json = JsonSerializer.Serialize(sources, JsonOpts);
-            var fileName = $"apisources_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-            var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
+            string json = JsonSerializer.Serialize(sources, JsonOpts);
+            string fileName = $"apisources_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            string filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
             await File.WriteAllTextAsync(filePath, json);
 
             await Share.Default.RequestAsync(new ShareFileRequest
@@ -349,10 +354,10 @@ public partial class SettingsViewModel : BaseViewModel
                 return;
             }
 
-            var completed = 0;
+            int completed = 0;
             var tasks = sources.Select(async s =>
             {
-                var result = await PingSourceAsync(s);
+                PingResult result = await PingSourceAsync(s);
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     PingResults.Add(result);
@@ -363,7 +368,7 @@ public partial class SettingsViewModel : BaseViewModel
 
             await Task.WhenAll(tasks);
 
-            var successCount = PingResults.Count(r => r.IsSuccess);
+            int successCount = PingResults.Count(r => r.IsSuccess);
             PingStatusText = $"测试完成: {successCount}/{sources.Count} 可用";
         }
         catch (Exception ex)
@@ -387,7 +392,7 @@ public partial class SettingsViewModel : BaseViewModel
         try
         {
             var sw = Stopwatch.StartNew();
-            var response = await _httpClient.GetAsync(source.ApiBaseUrl);
+            HttpResponseMessage response = await _httpClient.GetAsync(source.ApiBaseUrl);
             sw.Stop();
             result.IsSuccess = response.IsSuccessStatusCode;
             result.LatencyMs = sw.ElapsedMilliseconds;
@@ -415,7 +420,7 @@ public partial class SettingsViewModel : BaseViewModel
         try
         {
             if (item == null) return;
-            var source = await _databaseService.GetApiSourceByIdAsync(item.Id);
+            ApiSource? source = await _databaseService.GetApiSourceByIdAsync(item.Id);
 
             if (source != null)
             {
