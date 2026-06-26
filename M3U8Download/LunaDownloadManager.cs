@@ -1,4 +1,6 @@
-﻿using Mp4SubtitleParser;
+﻿using System.Collections.Concurrent;
+using System.Text;
+using Mp4SubtitleParser;
 using N_m3u8DL_RE.Common.Entity;
 using N_m3u8DL_RE.Common.Enum;
 using N_m3u8DL_RE.Common.Log;
@@ -12,8 +14,6 @@ using N_m3u8DL_RE.Parser;
 using N_m3u8DL_RE.Parser.Mp4;
 using N_m3u8DL_RE.Util;
 using Spectre.Console;
-using System.Collections.Concurrent;
-using System.Text;
 using Timer = System.Timers.Timer;
 
 namespace M3U8Download;
@@ -29,7 +29,7 @@ internal class LunaDownloadManager
     private List<OutputFile> OutputFiles = [];
 
     /// <summary>
-    ///     下载管理器
+    /// 下载管理器
     /// </summary>
     /// <param name="downloaderConfig">下载器配置</param>
     /// <param name="selectedSteams">选中的流，包含视频、音频、字幕等，每个流都有一个StreamSpec对象，默认就一个m3u8视频流</param>
@@ -48,17 +48,13 @@ internal class LunaDownloadManager
     // 从文件读取KEY
     private async Task SearchKeyAsync(string? currentKID)
     {
-        string? _key = await MP4DecryptUtil.SearchKeyFromFileAsync(DownloaderConfig.MyOptions.KeyTextFile, currentKID);
+        var _key = await MP4DecryptUtil.SearchKeyFromFileAsync(DownloaderConfig.MyOptions.KeyTextFile, currentKID);
         if (_key != null)
         {
             if (DownloaderConfig.MyOptions.Keys == null)
-            {
                 DownloaderConfig.MyOptions.Keys = [_key];
-            }
             else
-            {
                 DownloaderConfig.MyOptions.Keys = [..DownloaderConfig.MyOptions.Keys, _key];
-            }
         }
     }
 
@@ -86,9 +82,7 @@ internal class LunaDownloadManager
         {
             streamSpec.MediaType = MediaType.SUBTITLES;
             if (streamSpec.Extension is null or "ts")
-            {
                 streamSpec.Extension = "vtt";
-            }
         }
     }
 
@@ -96,7 +90,7 @@ internal class LunaDownloadManager
         SpeedContainer speedContainer)
     {
         speedContainer.ResetVars();
-        bool useAACFilter = false; // ffmpeg合并flag
+        var useAACFilter = false; // ffmpeg合并flag
         List<Mediainfo> mediaInfos = [];
         ConcurrentDictionary<MediaSegment, DownloadResult?> FileDic = new();
 
@@ -123,25 +117,25 @@ internal class LunaDownloadManager
             }
         }
 
-        MediaType type = streamSpec.MediaType ?? MediaType.VIDEO;
-        string dirName =
+        var type = streamSpec.MediaType ?? MediaType.VIDEO;
+        var dirName =
             $"{task.Id}_{OtherUtil.GetValidFileName(streamSpec.GroupId ?? "", "-")}_{streamSpec.Codecs}_{streamSpec.Bandwidth}_{streamSpec.Language}";
-        string tmpDir = Path.Combine(DownloaderConfig.DirPrefix, dirName);
-        string saveDir = DownloaderConfig.MyOptions.SaveDir ?? Environment.CurrentDirectory;
-        string saveName = DownloaderConfig.MyOptions.SaveName != null
+        var tmpDir = Path.Combine(DownloaderConfig.DirPrefix, dirName);
+        var saveDir = DownloaderConfig.MyOptions.SaveDir ?? Environment.CurrentDirectory;
+        var saveName = DownloaderConfig.MyOptions.SaveName != null
             ? $"{DownloaderConfig.MyOptions.SaveName}.{streamSpec.Language}".TrimEnd('.')
             : dirName;
         var headers = DownloaderConfig.Headers;
 
-        string decryptionBinaryPath = DownloaderConfig.MyOptions.DecryptionBinaryPath!;
-        DecryptEngine decryptEngine = DownloaderConfig.MyOptions.DecryptionEngine;
-        string mp4InitFile = "";
-        string? currentKID = "";
-        bool readInfo = false; // 是否读取过
+        var decryptionBinaryPath = DownloaderConfig.MyOptions.DecryptionBinaryPath!;
+        var decryptEngine = DownloaderConfig.MyOptions.DecryptionEngine;
+        var mp4InitFile = "";
+        var currentKID = "";
+        var readInfo = false; // 是否读取过
         var mp4Info = new ParsedMP4Info();
 
         // 用户自定义范围导致被跳过的时长 计算字幕偏移使用
-        double skippedDur = streamSpec.SkippedDuration ?? 0d;
+        var skippedDur = streamSpec.SkippedDuration ?? 0d;
 
         Logger.Debug($"dirName: {dirName}; tmpDir: {tmpDir}; saveDir: {saveDir}; saveName: {saveName}");
 
@@ -149,7 +143,7 @@ internal class LunaDownloadManager
         if (!Directory.Exists(tmpDir)) Directory.CreateDirectory(tmpDir);
         if (!Directory.Exists(saveDir)) Directory.CreateDirectory(saveDir);
 
-        int totalCount = segments.Count();
+        var totalCount = segments.Count();
         if (streamSpec.Playlist?.MediaInit != null) totalCount++;
 
         task.MaxValue = totalCount;
@@ -159,8 +153,7 @@ internal class LunaDownloadManager
         Logger.InfoMarkUp(ResString.startDownloading + streamSpec.ToShortString());
 
         // 对于CENC，全部自动开启二进制合并
-        if (!DownloaderConfig.MyOptions.BinaryMerge &&
-            totalCount >= 1 &&
+        if (!DownloaderConfig.MyOptions.BinaryMerge && totalCount >= 1 &&
             streamSpec.Playlist!.MediaParts.First().MediaSegments.First().EncryptInfo.Method ==
             EncryptMethod.CENC)
         {
@@ -178,8 +171,8 @@ internal class LunaDownloadManager
                 Logger.WarnMarkUp($"[darkorange3_1]{ResString.autoBinaryMerge}[/]");
             }
 
-            string path = Path.Combine(tmpDir, "_init.mp4.tmp");
-            DownloadResult? result =
+            var path = Path.Combine(tmpDir, "_init.mp4.tmp");
+            var result =
                 await Downloader.DownloadSegmentAsync(streamSpec.Playlist.MediaInit, path, speedContainer, headers);
             FileDic[streamSpec.Playlist.MediaInit] = result;
             if (result is not { Success: true }) throw new Exception("Download init file failed!");
@@ -194,21 +187,18 @@ internal class LunaDownloadManager
                 // try shaka packager, which can handle WebM
                 if (string.IsNullOrEmpty(currentKID) &&
                     DownloaderConfig.MyOptions.DecryptionEngine == DecryptEngine.SHAKA_PACKAGER)
-                {
                     currentKID = MP4DecryptUtil.ReadInitShaka(result.ActualFilePath, decryptionBinaryPath);
-                }
                 // 从文件读取KEY
                 await SearchKeyAsync(currentKID);
                 // 实时解密
                 if ((streamSpec.Playlist.MediaInit.IsEncrypted || !string.IsNullOrEmpty(currentKID)) &&
-                    DownloaderConfig.MyOptions.MP4RealTimeDecryption &&
-                    !string.IsNullOrEmpty(currentKID) &&
+                    DownloaderConfig.MyOptions.MP4RealTimeDecryption && !string.IsNullOrEmpty(currentKID) &&
                     StreamExtractor.ExtractorType != ExtractorType.MSS)
                 {
-                    string enc = result.ActualFilePath;
-                    string dec = Path.Combine(Path.GetDirectoryName(enc)!,
+                    var enc = result.ActualFilePath;
+                    var dec = Path.Combine(Path.GetDirectoryName(enc)!,
                         Path.GetFileNameWithoutExtension(enc) + "_dec" + Path.GetExtension(enc));
-                    bool dResult = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
+                    var dResult = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
                         DownloaderConfig.MyOptions.Keys, enc, dec, currentKID, isMultiDRM: mp4Info.isMultiDRM);
                     if (dResult) FileDic[streamSpec.Playlist.MediaInit]!.ActualFilePath = dec;
                 }
@@ -217,9 +207,7 @@ internal class LunaDownloadManager
                 if (!readInfo)
                 {
                     Logger.WarnMarkUp(ResString.readingInfo);
-                    // mediaInfos = await MediainfoUtil.ReadInfoAsync(DownloaderConfig.MyOptions.FFmpegBinaryPath!,
-                    //     result.ActualFilePath);
-                    mediaInfos = await MediainfoUtil.ReadInfoAsync(
+                    mediaInfos = await MediainfoUtil.ReadInfoAsync(DownloaderConfig.MyOptions.FFmpegBinaryPath!,
                         result.ActualFilePath);
                     mediaInfos.ForEach(info => Logger.InfoMarkUp(info.ToStringMarkUp()));
                     ChangeSpecInfo(streamSpec, mediaInfos, ref useAACFilter);
@@ -229,17 +217,17 @@ internal class LunaDownloadManager
         }
 
         // 计算填零个数
-        string pad = "0".PadLeft(segments.Count().ToString().Length, '0');
+        var pad = "0".PadLeft(segments.Count().ToString().Length, '0');
 
         // 下载第一个分片
         if (!readInfo || StreamExtractor.ExtractorType == ExtractorType.MSS)
         {
-            MediaSegment seg = segments.First();
+            var seg = segments.First();
             segments = segments.Skip(1);
 
-            long index = seg.Index;
-            string path = Path.Combine(tmpDir, index.ToString(pad) + $".{streamSpec.Extension ?? "clip"}.tmp");
-            DownloadResult? result = await Downloader.DownloadSegmentAsync(seg, path, speedContainer, headers);
+            var index = seg.Index;
+            var path = Path.Combine(tmpDir, index.ToString(pad) + $".{streamSpec.Extension ?? "clip"}.tmp");
+            var result = await Downloader.DownloadSegmentAsync(seg, path, speedContainer, headers);
             FileDic[seg] = result;
             if (result is not { Success: true }) throw new Exception("Download first segment failed!");
             task.Increment(1);
@@ -249,17 +237,16 @@ internal class LunaDownloadManager
                 if (StreamExtractor.ExtractorType == ExtractorType.MSS)
                 {
                     var processor = new MSSMoovProcessor(streamSpec);
-                    byte[] header = processor.GenHeader(File.ReadAllBytes(result.ActualFilePath));
+                    var header = processor.GenHeader(File.ReadAllBytes(result.ActualFilePath));
                     await File.WriteAllBytesAsync(FileDic[streamSpec.Playlist!.MediaInit!]!.ActualFilePath, header);
-                    if (seg.IsEncrypted &&
-                        DownloaderConfig.MyOptions.MP4RealTimeDecryption &&
+                    if (seg.IsEncrypted && DownloaderConfig.MyOptions.MP4RealTimeDecryption &&
                         !string.IsNullOrEmpty(currentKID))
                     {
                         // 需要重新解密init
-                        string enc = FileDic[streamSpec.Playlist!.MediaInit!]!.ActualFilePath;
-                        string dec = Path.Combine(Path.GetDirectoryName(enc)!,
+                        var enc = FileDic[streamSpec.Playlist!.MediaInit!]!.ActualFilePath;
+                        var dec = Path.Combine(Path.GetDirectoryName(enc)!,
                             Path.GetFileNameWithoutExtension(enc) + "_dec" + Path.GetExtension(enc));
-                        bool dResult = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
+                        var dResult = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
                             DownloaderConfig.MyOptions.Keys, enc, dec, currentKID);
                         if (dResult) FileDic[streamSpec.Playlist!.MediaInit!]!.ActualFilePath = dec;
                     }
@@ -270,21 +257,18 @@ internal class LunaDownloadManager
                 // try shaka packager, which can handle WebM
                 if (string.IsNullOrEmpty(currentKID) &&
                     DownloaderConfig.MyOptions.DecryptionEngine == DecryptEngine.SHAKA_PACKAGER)
-                {
                     currentKID = MP4DecryptUtil.ReadInitShaka(result.ActualFilePath, decryptionBinaryPath);
-                }
                 // 从文件读取KEY
                 await SearchKeyAsync(currentKID);
                 // 实时解密
-                if (seg.IsEncrypted &&
-                    DownloaderConfig.MyOptions.MP4RealTimeDecryption &&
+                if (seg.IsEncrypted && DownloaderConfig.MyOptions.MP4RealTimeDecryption &&
                     !string.IsNullOrEmpty(currentKID))
                 {
-                    string enc = result.ActualFilePath;
-                    string dec = Path.Combine(Path.GetDirectoryName(enc)!,
+                    var enc = result.ActualFilePath;
+                    var dec = Path.Combine(Path.GetDirectoryName(enc)!,
                         Path.GetFileNameWithoutExtension(enc) + "_dec" + Path.GetExtension(enc));
                     mp4Info = MP4DecryptUtil.GetMP4Info(enc);
-                    bool dResult = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
+                    var dResult = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
                         DownloaderConfig.MyOptions.Keys, enc, dec, currentKID, mp4InitFile, mp4Info.isMultiDRM);
                     if (dResult)
                     {
@@ -297,9 +281,7 @@ internal class LunaDownloadManager
                 {
                     // ffmpeg读取信息
                     Logger.WarnMarkUp(ResString.readingInfo);
-                    // mediaInfos = await MediainfoUtil.ReadInfoAsync(DownloaderConfig.MyOptions.FFmpegBinaryPath!,
-                    //     result!.ActualFilePath);
-                    mediaInfos = await MediainfoUtil.ReadInfoAsync(
+                    mediaInfos = await MediainfoUtil.ReadInfoAsync(DownloaderConfig.MyOptions.FFmpegBinaryPath!,
                         result!.ActualFilePath);
                     mediaInfos.ForEach(info => Logger.InfoMarkUp(info.ToStringMarkUp()));
                     ChangeSpecInfo(streamSpec, mediaInfos, ref useAACFilter);
@@ -315,25 +297,21 @@ internal class LunaDownloadManager
         };
         await Parallel.ForEachAsync(segments, options, async (seg, _) =>
         {
-            long index = seg.Index;
-            string path = Path.Combine(tmpDir, index.ToString(pad) + $".{streamSpec.Extension ?? "clip"}.tmp");
-            DownloadResult? result = await Downloader.DownloadSegmentAsync(seg, path, speedContainer, headers);
+            var index = seg.Index;
+            var path = Path.Combine(tmpDir, index.ToString(pad) + $".{streamSpec.Extension ?? "clip"}.tmp");
+            var result = await Downloader.DownloadSegmentAsync(seg, path, speedContainer, headers);
             FileDic[seg] = result;
             if (result is { Success: true })
-            {
                 task.Increment(1);
-            }
             // 实时解密
-            if (seg.IsEncrypted &&
-                DownloaderConfig.MyOptions.MP4RealTimeDecryption &&
-                result is { Success: true } &&
+            if (seg.IsEncrypted && DownloaderConfig.MyOptions.MP4RealTimeDecryption && result is { Success: true } &&
                 !string.IsNullOrEmpty(currentKID))
             {
-                string enc = result.ActualFilePath;
-                string dec = Path.Combine(Path.GetDirectoryName(enc)!,
+                var enc = result.ActualFilePath;
+                var dec = Path.Combine(Path.GetDirectoryName(enc)!,
                     Path.GetFileNameWithoutExtension(enc) + "_dec" + Path.GetExtension(enc));
                 mp4Info = MP4DecryptUtil.GetMP4Info(enc);
-                bool dResult = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
+                var dResult = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
                     DownloaderConfig.MyOptions.Keys, enc, dec, currentKID, mp4InitFile, mp4Info.isMultiDRM);
                 if (dResult)
                 {
@@ -344,36 +322,23 @@ internal class LunaDownloadManager
         });
 
         // 修改输出后缀
-        string outputExt = "." + streamSpec.Extension;
-        if (streamSpec.Extension == null)
-        {
-            outputExt = ".ts";
-        }
-        else if (streamSpec is { MediaType: MediaType.AUDIO, Extension: "m4s" or "mp4" })
-        {
-            outputExt = ".m4a";
-        }
+        var outputExt = "." + streamSpec.Extension;
+        if (streamSpec.Extension == null) outputExt = ".ts";
+        else if (streamSpec is { MediaType: MediaType.AUDIO, Extension: "m4s" or "mp4" }) outputExt = ".m4a";
         else if (streamSpec.MediaType != MediaType.SUBTITLES && streamSpec.Extension is "m4s" or "mp4")
-        {
             outputExt = ".mp4";
-        }
 
         if (DownloaderConfig.MyOptions.AutoSubtitleFix && streamSpec.MediaType == MediaType.SUBTITLES)
-        {
             outputExt = DownloaderConfig.MyOptions.SubtitleFormat == SubtitleFormat.SRT ? ".srt" : ".vtt";
-        }
-        string output = Path.Combine(saveDir, saveName + outputExt);
+        var output = Path.Combine(saveDir, saveName + outputExt);
 
         // 检测目标文件是否存在
         while (File.Exists(output))
-        {
             Logger.WarnMarkUp(
                 $"{Path.GetFileName(output)} => {Path.GetFileName(output = Path.ChangeExtension(output, "copy" + Path.GetExtension(output)))}");
-        }
 
         if (!string.IsNullOrEmpty(currentKID) &&
-            DownloaderConfig.MyOptions is { MP4RealTimeDecryption: true, Keys.Length: > 0 } &&
-            mp4InitFile != "")
+            DownloaderConfig.MyOptions is { MP4RealTimeDecryption: true, Keys.Length: > 0 } && mp4InitFile != "")
         {
             File.Delete(mp4InitFile);
             // shaka/ffmpeg实时解密不需要init文件用于合并
@@ -389,10 +354,7 @@ internal class LunaDownloadManager
 
         // 移除无效片段
         var badKeys = FileDic.Where(i => i.Value == null).Select(i => i.Key);
-        foreach (MediaSegment badKey in badKeys)
-        {
-            FileDic!.Remove(badKey, out _);
-        }
+        foreach (var badKey in badKeys) FileDic!.Remove(badKey, out _);
 
         // 校验完整性
         if (DownloaderConfig.CheckContentLength && FileDic.Values.Any(a => !a!.Success)) return false;
@@ -404,19 +366,17 @@ internal class LunaDownloadManager
         {
             Logger.WarnMarkUp(ResString.fixingVTT);
             // 排序字幕并修正时间戳
-            bool first = true;
+            var first = true;
             var finalVtt = new WebVttSub();
             var keys = FileDic.Keys.OrderBy(k => k.Index);
-            foreach (MediaSegment seg in keys)
+            foreach (var seg in keys)
             {
-                string vttContent = File.ReadAllText(FileDic[seg]!.ActualFilePath);
-                WebVttSub vtt = WebVttSub.Parse(vttContent);
+                var vttContent = File.ReadAllText(FileDic[seg]!.ActualFilePath);
+                var vtt = WebVttSub.Parse(vttContent);
                 // 手动计算MPEGTS
                 if (finalVtt.MpegtsTimestamp == 0 && vtt.MpegtsTimestamp == 0)
-                {
                     vtt.MpegtsTimestamp =
                         90000 * (long)(skippedDur + keys.Where(s => s.Index < seg.Index).Sum(s => s.Duration));
-                }
                 if (first)
                 {
                     finalVtt = vtt;
@@ -429,17 +389,14 @@ internal class LunaDownloadManager
             }
 
             // 写出字幕
-            string[] files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath).ToArray();
-            foreach (string item in files)
-            {
-                File.Delete(item);
-            }
+            var files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath).ToArray();
+            foreach (var item in files) File.Delete(item);
             FileDic.Clear();
-            int index = 0;
-            string path = Path.Combine(tmpDir, index.ToString(pad) + ".fix.vtt");
+            var index = 0;
+            var path = Path.Combine(tmpDir, index.ToString(pad) + ".fix.vtt");
             // 设置字幕偏移
             finalVtt.LeftShiftTime(TimeSpan.FromSeconds(skippedDur));
-            string subContentFixed = finalVtt.ToVtt();
+            var subContentFixed = finalVtt.ToVtt();
             // 转换字幕格式
             if (DownloaderConfig.MyOptions.SubtitleFormat != SubtitleFormat.VTT)
             {
@@ -456,35 +413,30 @@ internal class LunaDownloadManager
         }
 
         // 自动修复VTT mp4字幕
-        if (DownloaderConfig.MyOptions.AutoSubtitleFix &&
-            streamSpec.MediaType == MediaType.SUBTITLES &&
-            streamSpec.Codecs != "stpp" &&
-            streamSpec.Extension != null &&
-            streamSpec.Extension.Contains("m4s"))
+        if (DownloaderConfig.MyOptions.AutoSubtitleFix && streamSpec.MediaType == MediaType.SUBTITLES
+                                                       && streamSpec.Codecs != "stpp" && streamSpec.Extension != null &&
+                                                       streamSpec.Extension.Contains("m4s"))
         {
-            DownloadResult? initFile = FileDic.Values.FirstOrDefault(v => Path.GetFileName(v!.ActualFilePath).StartsWith("_init"));
-            byte[] iniFileBytes = File.ReadAllBytes(initFile!.ActualFilePath);
-            (bool sawVtt, uint timescale) = MP4VttUtil.CheckInit(iniFileBytes);
+            var initFile = FileDic.Values.FirstOrDefault(v => Path.GetFileName(v!.ActualFilePath).StartsWith("_init"));
+            var iniFileBytes = File.ReadAllBytes(initFile!.ActualFilePath);
+            var (sawVtt, timescale) = MP4VttUtil.CheckInit(iniFileBytes);
             if (sawVtt)
             {
                 Logger.WarnMarkUp(ResString.fixingVTTmp4);
-                string[] mp4s = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath)
+                var mp4s = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath)
                     .Where(p => p.EndsWith(".m4s")).ToArray();
-                WebVttSub finalVtt = MP4VttUtil.ExtractSub(mp4s, timescale);
+                var finalVtt = MP4VttUtil.ExtractSub(mp4s, timescale);
                 // 写出字幕
-                MediaSegment firstKey = FileDic.Keys.First();
-                string[] files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath)
+                var firstKey = FileDic.Keys.First();
+                var files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath)
                     .ToArray();
-                foreach (string item in files)
-                {
-                    File.Delete(item);
-                }
+                foreach (var item in files) File.Delete(item);
                 FileDic.Clear();
-                int index = 0;
-                string path = Path.Combine(tmpDir, index.ToString(pad) + ".fix.vtt");
+                var index = 0;
+                var path = Path.Combine(tmpDir, index.ToString(pad) + ".fix.vtt");
                 // 设置字幕偏移
                 finalVtt.LeftShiftTime(TimeSpan.FromSeconds(skippedDur));
-                string subContentFixed = finalVtt.ToVtt();
+                var subContentFixed = finalVtt.ToVtt();
                 // 转换字幕格式
                 if (DownloaderConfig.MyOptions.SubtitleFormat != SubtitleFormat.VTT)
                 {
@@ -507,18 +459,16 @@ internal class LunaDownloadManager
             streamSpec.Extension.Contains("ttml"))
         {
             Logger.WarnMarkUp(ResString.fixingTTML);
-            bool first = true;
+            var first = true;
             var finalVtt = new WebVttSub();
             var keys = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Key);
-            foreach (MediaSegment seg in keys)
+            foreach (var seg in keys)
             {
-                WebVttSub vtt = MP4TtmlUtil.ExtractFromTTML(FileDic[seg]!.ActualFilePath, 0);
+                var vtt = MP4TtmlUtil.ExtractFromTTML(FileDic[seg]!.ActualFilePath, 0);
                 // 手动计算MPEGTS
                 if (finalVtt.MpegtsTimestamp == 0 && vtt.MpegtsTimestamp == 0)
-                {
                     vtt.MpegtsTimestamp =
                         90000 * (long)(skippedDur + keys.Where(s => s.Index < seg.Index).Sum(s => s.Duration));
-                }
                 if (first)
                 {
                     finalVtt = vtt;
@@ -531,26 +481,22 @@ internal class LunaDownloadManager
             }
 
             // 写出字幕
-            MediaSegment firstKey = FileDic.Keys.First();
-            string[] files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath).ToArray();
+            var firstKey = FileDic.Keys.First();
+            var files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath).ToArray();
 
             // 处理图形字幕
             await SubtitleUtil.TryWriteImagePngsAsync(finalVtt, tmpDir);
 
-            string keepSegments = OtherUtil.GetEnvironmentVariable(EnvConfigKey.ReKeepImageSegments);
+            var keepSegments = OtherUtil.GetEnvironmentVariable(EnvConfigKey.ReKeepImageSegments);
             if (keepSegments != "1")
-            {
-                foreach (string item in files)
-                {
+                foreach (var item in files)
                     File.Delete(item);
-                }
-            }
             FileDic.Clear();
-            int index = 0;
-            string path = Path.Combine(tmpDir, index.ToString(pad) + ".fix.vtt");
+            var index = 0;
+            var path = Path.Combine(tmpDir, index.ToString(pad) + ".fix.vtt");
             // 设置字幕偏移
             finalVtt.LeftShiftTime(TimeSpan.FromSeconds(skippedDur));
-            string subContentFixed = finalVtt.ToVtt();
+            var subContentFixed = finalVtt.ToVtt();
             // 转换字幕格式
             if (DownloaderConfig.MyOptions.SubtitleFormat != SubtitleFormat.VTT)
             {
@@ -569,28 +515,25 @@ internal class LunaDownloadManager
         // 自动修复TTML mp4字幕
         if (DownloaderConfig.MyOptions.AutoSubtitleFix &&
             streamSpec is { MediaType: MediaType.SUBTITLES, Extension: not null } &&
-            streamSpec.Extension.Contains("m4s") &&
-            streamSpec.Codecs != null &&
-            streamSpec.Codecs.Contains("stpp"))
+            streamSpec.Extension.Contains("m4s")
+            && streamSpec.Codecs != null && streamSpec.Codecs.Contains("stpp"))
         {
             Logger.WarnMarkUp(ResString.fixingTTMLmp4);
             // sawTtml暂时不判断
             // var initFile = FileDic.Values.Where(v => Path.GetFileName(v!.ActualFilePath).StartsWith("_init")).FirstOrDefault();
             // var iniFileBytes = File.ReadAllBytes(initFile!.ActualFilePath);
             // var sawTtml = MP4TtmlUtil.CheckInit(iniFileBytes);
-            bool first = true;
+            var first = true;
             var finalVtt = new WebVttSub();
             var keys = FileDic.OrderBy(s => s.Key.Index).Where(v => v.Value!.ActualFilePath.EndsWith(".m4s"))
                 .Select(s => s.Key);
-            foreach (MediaSegment seg in keys)
+            foreach (var seg in keys)
             {
-                WebVttSub vtt = MP4TtmlUtil.ExtractFromMp4(FileDic[seg]!.ActualFilePath, 0);
+                var vtt = MP4TtmlUtil.ExtractFromMp4(FileDic[seg]!.ActualFilePath, 0);
                 // 手动计算MPEGTS
                 if (finalVtt.MpegtsTimestamp == 0 && vtt.MpegtsTimestamp == 0)
-                {
                     vtt.MpegtsTimestamp =
                         90000 * (long)(skippedDur + keys.Where(s => s.Index < seg.Index).Sum(s => s.Duration));
-                }
                 if (first)
                 {
                     finalVtt = vtt;
@@ -603,26 +546,22 @@ internal class LunaDownloadManager
             }
 
             // 写出字幕
-            MediaSegment firstKey = FileDic.Keys.First();
-            string[] files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath).ToArray();
+            var firstKey = FileDic.Keys.First();
+            var files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath).ToArray();
 
             // 处理图形字幕
             await SubtitleUtil.TryWriteImagePngsAsync(finalVtt, tmpDir);
 
-            string keepSegments = OtherUtil.GetEnvironmentVariable(EnvConfigKey.ReKeepImageSegments);
+            var keepSegments = OtherUtil.GetEnvironmentVariable(EnvConfigKey.ReKeepImageSegments);
             if (keepSegments != "1")
-            {
-                foreach (string item in files)
-                {
+                foreach (var item in files)
                     File.Delete(item);
-                }
-            }
             FileDic.Clear();
-            int index = 0;
-            string path = Path.Combine(tmpDir, index.ToString(pad) + ".fix.vtt");
+            var index = 0;
+            var path = Path.Combine(tmpDir, index.ToString(pad) + ".fix.vtt");
             // 设置字幕偏移
             finalVtt.LeftShiftTime(TimeSpan.FromSeconds(skippedDur));
-            string subContentFixed = finalVtt.ToVtt();
+            var subContentFixed = finalVtt.ToVtt();
             // 转换字幕格式
             if (DownloaderConfig.MyOptions.SubtitleFormat != SubtitleFormat.VTT)
             {
@@ -638,7 +577,7 @@ internal class LunaDownloadManager
             };
         }
 
-        bool mergeSuccess = false;
+        var mergeSuccess = false;
         // 合并
         if (!DownloaderConfig.MyOptions.SkipMerge)
         {
@@ -646,7 +585,7 @@ internal class LunaDownloadManager
             if (DownloaderConfig.MyOptions.BinaryMerge || streamSpec.MediaType == MediaType.SUBTITLES)
             {
                 Logger.InfoMarkUp(ResString.binaryMerge);
-                string[] files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath)
+                var files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath)
                     .ToArray();
                 MergeUtil.CombineMultipleFilesIntoSingleFile(files, output);
                 mergeSuccess = true;
@@ -654,38 +593,30 @@ internal class LunaDownloadManager
             else
             {
                 // ffmpeg合并
-                string[] files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath)
+                var files = FileDic.OrderBy(s => s.Key.Index).Select(s => s.Value).Select(v => v!.ActualFilePath)
                     .ToArray();
                 Logger.InfoMarkUp(ResString.ffmpegMerge);
-                string ext = streamSpec.MediaType == MediaType.AUDIO ? "m4a" : "mp4";
-                string ffOut = Path.Combine(Path.GetDirectoryName(output)!,
+                var ext = streamSpec.MediaType == MediaType.AUDIO ? "m4a" : "mp4";
+                var ffOut = Path.Combine(Path.GetDirectoryName(output)!,
                     Path.GetFileNameWithoutExtension(output) + $".{ext}");
                 // 检测目标文件是否存在
                 while (File.Exists(ffOut))
-                {
                     Logger.WarnMarkUp(
                         $"{Path.GetFileName(ffOut)} => {Path.GetFileName(ffOut = Path.ChangeExtension(ffOut, "copy" + Path.GetExtension(ffOut)))}");
-                }
                 // 大于1800分片，需要分步骤合并
                 if (files.Length >= 1800)
                 {
                     Logger.WarnMarkUp(ResString.partMerge);
                     files = MergeUtil.PartialCombineMultipleFiles(files);
                     FileDic.Clear();
-                    foreach (string item in files)
-                    {
+                    foreach (var item in files)
                         FileDic[new MediaSegment { Url = item }] = new DownloadResult
                         {
                             ActualFilePath = item
                         };
-                    }
                 }
 
-                // mergeSuccess = MergeUtil.MergeByFFmpeg(DownloaderConfig.MyOptions.FFmpegBinaryPath!, files,
-                //     Path.ChangeExtension(ffOut, null), ext, useAACFilter,
-                //     writeDate: !DownloaderConfig.MyOptions.NoDateInfo,
-                //     useConcatDemuxer: DownloaderConfig.MyOptions.UseFFmpegConcatDemuxer);
-                mergeSuccess = MergeUtil.MergeByFFmpeg(files,
+                mergeSuccess = MergeUtil.MergeByFFmpeg(DownloaderConfig.MyOptions.FFmpegBinaryPath!, files,
                     Path.ChangeExtension(ffOut, null), ext, useAACFilter,
                     writeDate: !DownloaderConfig.MyOptions.NoDateInfo,
                     useConcatDemuxer: DownloaderConfig.MyOptions.UseFFmpegConcatDemuxer);
@@ -697,17 +628,12 @@ internal class LunaDownloadManager
         if (DownloaderConfig.MyOptions is { SkipMerge: false, DelAfterDone: true } && mergeSuccess)
         {
             var files = FileDic.Values.Select(v => v!.ActualFilePath);
-            foreach (string file in files)
-            {
-                File.Delete(file);
-            }
+            foreach (var file in files) File.Delete(file);
             OtherUtil.SafeDeleteDir(tmpDir);
         }
 
         // 重新读取init信息
-        if (mergeSuccess &&
-            totalCount >= 1 &&
-            string.IsNullOrEmpty(currentKID) &&
+        if (mergeSuccess && totalCount >= 1 && string.IsNullOrEmpty(currentKID) &&
             streamSpec.Playlist!.MediaParts.First().MediaSegments.First().EncryptInfo.Method !=
             EncryptMethod.NONE)
         {
@@ -715,26 +641,21 @@ internal class LunaDownloadManager
             // try shaka packager, which can handle WebM
             if (string.IsNullOrEmpty(currentKID) &&
                 DownloaderConfig.MyOptions.DecryptionEngine == DecryptEngine.SHAKA_PACKAGER)
-            {
                 currentKID = MP4DecryptUtil.ReadInitShaka(output, decryptionBinaryPath);
-            }
             // 从文件读取KEY
             await SearchKeyAsync(currentKID);
         }
 
         // 调用mp4decrypt解密
-        if (mergeSuccess &&
-            File.Exists(output) &&
-            !string.IsNullOrEmpty(currentKID) &&
-            DownloaderConfig.MyOptions is
+        if (mergeSuccess && File.Exists(output) && !string.IsNullOrEmpty(currentKID) && DownloaderConfig.MyOptions is
                 { MP4RealTimeDecryption: false, Keys.Length: > 0 })
         {
-            string enc = output;
-            string dec = Path.Combine(Path.GetDirectoryName(enc)!,
+            var enc = output;
+            var dec = Path.Combine(Path.GetDirectoryName(enc)!,
                 Path.GetFileNameWithoutExtension(enc) + "_dec" + Path.GetExtension(enc));
             mp4Info = MP4DecryptUtil.GetMP4Info(enc);
             Logger.InfoMarkUp($"[grey]Decrypting using {decryptEngine}...[/]");
-            bool result = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
+            var result = await MP4DecryptUtil.DecryptAsync(decryptEngine, decryptionBinaryPath,
                 DownloaderConfig.MyOptions.Keys, enc, dec, currentKID, isMultiDRM: mp4Info.isMultiDRM);
             if (result)
             {
@@ -745,7 +666,6 @@ internal class LunaDownloadManager
 
         // 记录所有文件信息
         if (File.Exists(output))
-        {
             OutputFiles.Add(new OutputFile
             {
                 Index = task.Id,
@@ -755,7 +675,6 @@ internal class LunaDownloadManager
                 Mediainfos = mediaInfos,
                 MediaType = streamSpec.MediaType
             });
-        }
 
         return true;
     }
@@ -767,14 +686,12 @@ internal class LunaDownloadManager
 
         if (DownloaderConfig.MyOptions is
             { MP4RealTimeDecryption: true, DecryptionEngine: not DecryptEngine.SHAKA_PACKAGER, Keys.Length: > 0 })
-        {
             Logger.WarnMarkUp($"[darkorange3_1]{ResString.realTimeDecMessage}[/]");
-        }
 
         // 创建任务
         var dic = SelectedSteams.Select(item =>
         {
-            string description = item.ToShortShortString();
+            var description = item.ToShortShortString();
             _downloadStatus[_taskId] = new DownloadStatus
             {
                 Name = DownloaderConfig.MyOptions.SaveName,
@@ -786,51 +703,42 @@ internal class LunaDownloadManager
             SpeedContainerDic[_taskId] = new SpeedContainer(); // 速度计算
             // 限速设置
             if (DownloaderConfig.MyOptions.MaxSpeed != null)
-            {
                 SpeedContainerDic[_taskId].SpeedLimit = DownloaderConfig.MyOptions.MaxSpeed.Value;
-            }
             _taskId++;
             return (item, task);
         }).ToDictionary(item => item.item, item => item.task);
 
         if (!DownloaderConfig.MyOptions.ConcurrentDownload)
             // 遍历，顺序下载
-        {
-            foreach ((StreamSpec item, ProgressTask task) in dic)
+            foreach (var (item, task) in dic)
             {
                 var goTimer = new Timer(1000);
-                goTimer.Elapsed += (_, _) =>
-                {
-                    RunTask(item, task, SpeedContainerDic);
-                };
+                goTimer.Elapsed += (_, _) => { RunTask(item, task, SpeedContainerDic); };
                 goTimer.Start();
-                bool result = await DownloadStreamAsync(item, task, SpeedContainerDic[task.Id]);
+                var result = await DownloadStreamAsync(item, task, SpeedContainerDic[task.Id]);
                 goTimer.Stop();
                 RunTask(item, task, SpeedContainerDic);
                 Results[item] = result;
                 // 失败不再下载后续
                 if (!result) break;
             }
-        }
         else
             // 并发下载
-        {
             await Parallel.ForEachAsync(dic, async (kp, _) =>
             {
-                ProgressTask task = kp.Value;
-                bool result = await DownloadStreamAsync(kp.Key, task, SpeedContainerDic[task.Id]);
+                var task = kp.Value;
+                var result = await DownloadStreamAsync(kp.Key, task, SpeedContainerDic[task.Id]);
                 Results[kp.Key] = result;
             });
-        }
 
-        bool success = Results.Values.All(v => v == true);
+        var success = Results.Values.All(v => v == true);
 
         // 删除临时文件夹
         if (DownloaderConfig.MyOptions is { SkipMerge: false, DelAfterDone: true } && success)
         {
             foreach (var item in StreamExtractor.RawFiles)
             {
-                string file = Path.Combine(DownloaderConfig.DirPrefix, item.Key);
+                var file = Path.Combine(DownloaderConfig.DirPrefix, item.Key);
                 if (File.Exists(file)) File.Delete(file);
             }
 
@@ -843,34 +751,24 @@ internal class LunaDownloadManager
             OutputFiles = OutputFiles.OrderBy(o => o.Index).ToList();
             // 是否跳过字幕
             if (DownloaderConfig.MyOptions.MuxOptions!.SkipSubtitle)
-            {
                 OutputFiles = OutputFiles.Where(o => o.MediaType != MediaType.SUBTITLES).ToList();
-            }
             if (DownloaderConfig.MyOptions.MuxImports != null)
-            {
                 OutputFiles.AddRange(DownloaderConfig.MyOptions.MuxImports);
-            }
             OutputFiles.ForEach(f => Logger.WarnMarkUp($"[grey]{Path.GetFileName(f.FilePath).EscapeMarkup()}[/]"));
-            string saveDir = DownloaderConfig.MyOptions.SaveDir ?? Environment.CurrentDirectory;
-            string ext = OtherUtil.GetMuxExtension(DownloaderConfig.MyOptions.MuxOptions.MuxFormat);
-            string dirName = Path.GetFileName(DownloaderConfig.DirPrefix);
-            string outName = $"{dirName}.MUX";
-            string outPath = Path.Combine(saveDir, outName);
+            var saveDir = DownloaderConfig.MyOptions.SaveDir ?? Environment.CurrentDirectory;
+            var ext = OtherUtil.GetMuxExtension(DownloaderConfig.MyOptions.MuxOptions.MuxFormat);
+            var dirName = Path.GetFileName(DownloaderConfig.DirPrefix);
+            var outName = $"{dirName}.MUX";
+            var outPath = Path.Combine(saveDir, outName);
             Logger.WarnMarkUp($"Muxing to [grey]{outName.EscapeMarkup()}{ext}[/]");
-            bool result = false;
+            var result = false;
             if (DownloaderConfig.MyOptions.MuxOptions.UseMkvmerge)
-            {
                 result = MergeUtil.MuxInputsByMkvmerge(DownloaderConfig.MyOptions.MkvmergeBinaryPath!,
                     OutputFiles.ToArray(), outPath);
-            }
             else
-            {
-                // result = MergeUtil.MuxInputsByFFmpeg(DownloaderConfig.MyOptions.FFmpegBinaryPath!,
-                //     OutputFiles.ToArray(), outPath, DownloaderConfig.MyOptions.MuxOptions.MuxFormat,
-                //     !DownloaderConfig.MyOptions.NoDateInfo);
-                result = MergeUtil.MuxInputsByFFmpeg(OutputFiles.ToArray(), outPath, DownloaderConfig.MyOptions.MuxOptions.MuxFormat,
+                result = MergeUtil.MuxInputsByFFmpeg(DownloaderConfig.MyOptions.FFmpegBinaryPath!,
+                    OutputFiles.ToArray(), outPath, DownloaderConfig.MyOptions.MuxOptions.MuxFormat,
                     !DownloaderConfig.MyOptions.NoDateInfo);
-            }
             // 完成后删除各轨道文件
             if (result)
             {
@@ -878,7 +776,7 @@ internal class LunaDownloadManager
                 {
                     Logger.WarnMarkUp("[grey]Cleaning files...[/]");
                     OutputFiles.ForEach(f => File.Delete(f.FilePath));
-                    string tmpDir = DownloaderConfig.MyOptions.TmpDir ?? Environment.CurrentDirectory;
+                    var tmpDir = DownloaderConfig.MyOptions.TmpDir ?? Environment.CurrentDirectory;
                     OtherUtil.SafeDeleteDir(tmpDir);
                 }
             }
@@ -889,7 +787,7 @@ internal class LunaDownloadManager
             }
 
             // 判断是否要改名
-            string newPath = Path.ChangeExtension(outPath, ext);
+            var newPath = Path.ChangeExtension(outPath, ext);
             if (result && !File.Exists(newPath))
             {
                 Logger.WarnMarkUp($"Rename to [grey]{Path.GetFileName(newPath).EscapeMarkup()}[/]");
@@ -903,7 +801,7 @@ internal class LunaDownloadManager
     private void RunTask(StreamSpec spec, ProgressTask task,
         ConcurrentDictionary<int, SpeedContainer> speedContainerDic)
     {
-        DownloadStatus ds = _downloadStatus[task.Id];
+        var ds = _downloadStatus[task.Id];
         // 下载百分比
         ds.Percentage = task.Percentage;
         if (task.IsFinished)
@@ -917,7 +815,7 @@ internal class LunaDownloadManager
 
         if (task.Value <= 0) return;
 
-        SpeedContainer speedContainer = speedContainerDic[task.Id];
+        var speedContainer = speedContainerDic[task.Id];
         ds.Size = speedContainer.RDownloaded;
         ds.TotalSize = speedContainer.SingleSegment
             ? speedContainer.ResponseLength ?? 0
@@ -927,13 +825,8 @@ internal class LunaDownloadManager
         speedContainer.NowSpeed = speedContainer.Downloaded;
         // 速度为0，计数增加
         if (speedContainer.Downloaded <= 0)
-        {
             speedContainer.AddLowSpeedCount();
-        }
-        else
-        {
-            speedContainer.ResetLowSpeedCount();
-        }
+        else speedContainer.ResetLowSpeedCount();
 
         speedContainer.Reset();
 
@@ -942,19 +835,12 @@ internal class LunaDownloadManager
         ds.RemainingTime = task.RemainingTime;
 
         if (!ds.RemainingTime.HasValue)
-        {
             ds.RemainingTimeStr = "--:--:--";
-        }
         else if (ds.RemainingTime.Value.TotalHours > 99.0)
-        {
             ds.RemainingTimeStr = "**:**:**";
-        }
         else
-        {
             ds.RemainingTimeStr = $"{ds.RemainingTime.Value:hh\\:mm\\:ss}";
-        }
 
         Console.WriteLine($"download {ds.Percentage:F2}% {ds.SizeStr} {ds.Speed} {ds.RemainingTimeStr}");
-        Logger.Info($"download {ds.Percentage:F2}% {ds.SizeStr} {ds.Speed} {ds.RemainingTimeStr}");
     }
 }

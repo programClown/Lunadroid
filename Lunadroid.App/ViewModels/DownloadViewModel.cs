@@ -3,8 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
-using M3U8Download;
-using UraniumUI.Extensions;
 using Environment = Android.OS.Environment;
 
 namespace Lunadroid.App.ViewModels;
@@ -35,13 +33,6 @@ public partial class DownloadViewModel : BaseViewModel
         if (IsBusy) return;
         IsBusy = true;
 
-        await Task.Run(async () =>
-        {
-            var downloadManager = new DownloadManager();
-            downloadManager.ExternalPath = Path.Combine(Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments)!.AbsolutePath, "m3u8");
-            await downloadManager.DownloadAsync("https://vod.360zyx.vip/20250708/7T2xjBRd/index.m3u8", Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments)!.AbsolutePath, "曼达洛人");
-        }).ConfigureAwait(false);
-        
         try
         {
             var downloadingList = await _databaseService.GetDownloadingRecordsAsync();
