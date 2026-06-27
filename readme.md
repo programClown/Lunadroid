@@ -94,96 +94,32 @@ dotnet workload install maui-android
 
 ---
 
-## 构建过程及问题解决
-
-在项目的构建过程中，遇到了以下编译错误并逐一解决：
-
-### 1. XA5300：找不到 Android SDK
-
-**错误：** 构建系统无法定位 Android SDK。
-
-**解决：** 将 Android SDK 安装至 `C:\Android\sdk`，并在构建时通过 `AndroidSdkDirectory` 属性指定路径。
-
-### 2. XA5207：找不到 API level 36 的 android.jar
-
-**错误：** 项目目标 API 为 36，但本地 SDK 缺少对应平台的 `android.jar`。
-
-**解决：** 通过 SDK Manager 安装 android-36 平台。
-
-### 3. CS0234：MediaElement 命名空间错误
-
-**错误：** 引用了不正确的 `using` 指令，导致 MediaElement 命名空间无法解析。
-
-**解决：** 移除了错误的 `using` 指令。
-
-### 4. CS0200：RequestedTheme 为只读属性
-
-**错误：** 尝试对 `Application.Current.RequestedTheme` 赋值，但该属性为只读。
-
-**解决：** 改用 `Application.Current.UserAppTheme` 来设置应用主题。
-
-### 5. CS0104：ServiceProvider 命名冲突
-
-**错误：** `ServiceProvider` 类名与框架中已有类型产生歧义。
-
-**解决：** 将服务定位器类重命名为 `AppServices`，避免命名冲突。
-
-### 6. CS1739 / CS7036：MediaElement 参数问题
-
-**错误：** MediaElement 的注册方法参数不匹配。
-
-**解决：** 使用 `UseMauiCommunityToolkitMediaElement(true)` 进行注册，传入 `true` 参数以启用自动初始化。
-
-### 7. CS1061：缺少 DatabaseService 方法
-
-**错误：** ViewModel 中调用了 DatabaseService 中尚不存在的方法。
-
-**解决：** 在 DatabaseService 中添加了以下方法：
-
-- `GetMovieSourceByIdAsync` —— 根据 ID 获取影视源
-- `InsertOrUpdateMovieAsync` —— 插入或更新影视记录
-- `InsertEpisodesAsync` —— 批量插入剧集
-- `InsertDownloadRecordAsync` —— 插入下载记录
-
-### 8. CS1061：ViewModel 中方法名不匹配
-
-**错误：** ViewModel 调用的方法名与 DatabaseService 中实际的方法名不一致。
-
-**解决：** 修正 ViewModel 中的方法调用，使其匹配 DatabaseService 的实际 API。
-
-### 9. CS1503：删除方法类型不匹配
-
-**错误：** 删除操作传入的参数类型与方法签名不匹配。
-
-**解决：** 改用带 `ById` 后缀的重载方法（如 `DeleteXxxByIdAsync`），确保传入 ID 类型正确。
-
-### 10. CS0618：DisplayAlert 已弃用警告
-
-**错误：** `DisplayAlert` 方法标记为已过时，产生编译器警告。
-
-**说明：** 此为已知警告，不影响编译和运行，暂未处理。
-
----
-
-## 测试结果
-
-全部测试通过，测试覆盖情况如下：
-
-| 测试类 | 测试数量 | 说明 |
-|--------|---------|------|
-| DatabaseServiceTests | 34 | 6 张表的完整 CRUD 操作及全局操作 |
-| RelativeTimeHelperTests | 17 | 相对时间、时长、文件大小格式化 |
-| AppConfigServiceTests | 6 | 默认值、更新、重置、持久化 |
-| **合计** | **57** | **全部通过，0 失败** |
-
----
-
 ## 构建命令
 
 在项目根目录执行以下命令进行构建：
 
 ```bash
 dotnet build -p:AndroidSdkDirectory="C:\Android\sdk"
+```
+
+```
+-1 确保 SDK 版本一致（global.json 控制）
+dotnet --version
+
+2. 还原依赖
+dotnet restore Lunadroid.App/Lunadroid.App.csproj
+
+3. 使用 git commit hash 作为 BuildDate 发布
+dotnet publish Lunadroid.App/Lunadroid.App.csproj `
+    -p:AndroidSdkDirectory="D:\Program Files (x86)\Microsoft Visual Studio\Shared\Android\android-sdk" `
+    -c Release `
+    -f net10.0-android `
+    -r android-arm64 `
+    -p:ContinuousIntegrationBuild=true
+
+4. APK 输出路径
+Lunadroid.App\bin\Release\net10.0-android\android-arm64\com.lunadroid.app-Signed.apk
+
 ```
 
 ## 测试命令

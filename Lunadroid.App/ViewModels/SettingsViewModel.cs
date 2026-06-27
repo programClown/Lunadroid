@@ -1,12 +1,12 @@
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Lunadroid.App.ViewModels;
 
@@ -53,9 +53,12 @@ public partial class SettingsViewModel : BaseViewModel
     private readonly DatabaseService _databaseService;
     private readonly HttpClient _httpClient;
     [ObservableProperty] private bool _autoplay;
+    [ObservableProperty] private string _cacheSizeText = "计算中...";
     [ObservableProperty] private string _cloudSourceUrl = string.Empty;
     [ObservableProperty] private string _fetchStatusText = string.Empty;
     [ObservableProperty] private bool _forceApiNeedSpecialSource;
+    [ObservableProperty] private bool _isCalculatingCache;
+    [ObservableProperty] private bool _isClearingCache;
     [ObservableProperty] private bool _isExporting;
 
     [ObservableProperty] private bool _isFetchingSources;
@@ -77,11 +80,12 @@ public partial class SettingsViewModel : BaseViewModel
     }
 
     public ObservableCollection<ApiSourceItem> ApiSourceItems { get; } = [];
+    public ObservableCollection<CacheItemInfo> CacheItems { get; } = [];
     public ObservableCollection<PingResult> PingResults { get; } = [];
 
     private void LoadConfigFromService()
     {
-        AppConfig c = _appConfigService.Config;
+        var c = _appConfigService.Config;
         ForceApiNeedSpecialSource = c.ForceApiNeedSpecialSource;
         IsSecurityLockEnabled = c.SecurityLockEnabled;
         Autoplay = c.Autoplay;
@@ -127,7 +131,7 @@ public partial class SettingsViewModel : BaseViewModel
         {
             var sources = await _databaseService.GetApiSourcesAsync();
             ApiSourceItems.Clear();
-            foreach (ApiSource s in sources)
+            foreach (var s in sources)
             {
                 ApiSourceItems.Add(new ApiSourceItem
                 {
@@ -146,13 +150,155 @@ public partial class SettingsViewModel : BaseViewModel
         }
     }
 
+    public async Task LoadCacheInfoAsync()
+    {
+        if (IsCalculatingCache) return;
+        IsCalculatingCache = true;
+        try
+        {
+            var cacheDir = FileSystem.CacheDirectory;
+            var files = new List<FileInfo>();
+            if (Directory.Exists(cacheDir))
+            {
+                files.AddRange(GetAllFiles(new DirectoryInfo(cacheDir)));
+            }
+
+            var totalSize = files.Sum(f => f.Length);
+            CacheSizeText = FormatFileSize(totalSize);
+
+            var top10 = files.OrderByDescending(f => f.Length).Take(10).ToList();
+            CacheItems.Clear();
+            foreach (var file in top10)
+            {
+                CacheItems.Add(new CacheItemInfo
+                {
+                    FileName = Path.GetRelativePath(cacheDir, file.FullName),
+                    FilePath = file.FullName,
+                    SizeText = FormatFileSize(file.Length),
+                    Size = file.Length
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            CacheSizeText = "计算失败";
+            Logger.Error($"LoadCacheInfo failed: {ex.Message}");
+        }
+        finally
+        {
+            IsCalculatingCache = false;
+        }
+    }
+
+    private static List<FileInfo> GetAllFiles(DirectoryInfo dir)
+    {
+        var result = new List<FileInfo>();
+        try
+        {
+            result.AddRange(dir.GetFiles());
+            foreach (var subDir in dir.GetDirectories())
+            {
+                result.AddRange(GetAllFiles(subDir));
+            }
+        }
+        catch
+        {
+        }
+
+        return result;
+    }
+
+    private static string FormatFileSize(long bytes)
+    {
+        string[] units = ["B", "KB", "MB", "GB"];
+        double size = bytes;
+        var unitIndex = 0;
+        while (size >= 1024 && unitIndex < units.Length - 1)
+        {
+            size /= 1024;
+            unitIndex++;
+        }
+
+        return $"{size:0.##} {units[unitIndex]}";
+    }
+
+    [RelayCommand]
+    private async Task DeleteCacheItemAsync(CacheItemInfo? item)
+    {
+        if (item == null) return;
+        try
+        {
+            if (File.Exists(item.FilePath))
+            {
+                File.Delete(item.FilePath);
+                var dir = Path.GetDirectoryName(item.FilePath);
+                if (dir != null && Directory.Exists(dir) && !Directory.EnumerateFileSystemEntries(dir).Any())
+                {
+                    Directory.Delete(dir);
+                }
+            }
+
+            CacheItems.Remove(item);
+            await LoadCacheInfoAsync();
+            await Toast.Make("已删除").Show();
+        }
+        catch (Exception ex)
+        {
+            await Toast.Make($"删除失败: {ex.Message}").Show();
+        }
+    }
+
+    [RelayCommand]
+    private async Task ClearAllCacheAsync()
+    {
+        if (IsClearingCache) return;
+        IsClearingCache = true;
+        try
+        {
+            var cacheDir = FileSystem.CacheDirectory;
+            if (Directory.Exists(cacheDir))
+            {
+                foreach (var file in Directory.GetFiles(cacheDir, "*", SearchOption.AllDirectories))
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                foreach (var dir in Directory.GetDirectories(cacheDir))
+                {
+                    try
+                    {
+                        Directory.Delete(dir, true);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+
+            CacheItems.Clear();
+            CacheSizeText = "0 B";
+            await Toast.Make("缓存已清除").Show();
+        }
+        catch (Exception ex)
+        {
+            await Toast.Make($"清除失败: {ex.Message}").Show();
+        }
+        finally
+        {
+            IsClearingCache = false;
+        }
+    }
+
     [RelayCommand]
     private async Task ResetPinCodeAsync()
     {
-        _appConfigService.UpdateConfig(c =>
-        {
-            c.PinCode = null;
-        });
+        _appConfigService.UpdateConfig(c => { c.PinCode = null; });
 
         await Toast.Make("PIN码已重置成功").Show();
     }
@@ -167,14 +313,14 @@ public partial class SettingsViewModel : BaseViewModel
 
         try
         {
-            string url = string.IsNullOrWhiteSpace(CloudSourceUrl)
+            var url = string.IsNullOrWhiteSpace(CloudSourceUrl)
                 ? "https://pz.v88.qzz.io?format=0&source=jin18"
                 : CloudSourceUrl;
 
-            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                string jsonString = await response.Content.ReadAsStringAsync();
+                var jsonString = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"Response: {jsonString}");
 
                 // 解析JSON响应
@@ -187,7 +333,7 @@ public partial class SettingsViewModel : BaseViewModel
                 {
                     var cloudApiSources = new List<ApiSource>();
                     // 处理云端数据
-                    foreach ((string source, CloudApiSite site) in cloudData.ApiSite)
+                    foreach (var (source, site) in cloudData.ApiSite)
                     {
                         cloudApiSources.Add(new ApiSource
                         {
@@ -248,7 +394,7 @@ public partial class SettingsViewModel : BaseViewModel
         IsImporting = true;
         try
         {
-            FileResult? result = await FilePicker.Default.PickAsync(new PickOptions
+            var result = await FilePicker.Default.PickAsync(new PickOptions
             {
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
@@ -259,12 +405,12 @@ public partial class SettingsViewModel : BaseViewModel
 
             if (result == null) return;
 
-            await using Stream stream = await result.OpenReadAsync();
+            await using var stream = await result.OpenReadAsync();
             using var reader = new StreamReader(stream);
-            string json = await reader.ReadToEndAsync();
+            var json = await reader.ReadToEndAsync();
 
             List<ApiSource> sources;
-            string trimmed = json.Trim();
+            var trimmed = json.Trim();
             if (trimmed.StartsWith("["))
             {
                 sources = JsonSerializer.Deserialize<List<ApiSource>>(json, JsonOpts) ?? [];
@@ -274,8 +420,8 @@ public partial class SettingsViewModel : BaseViewModel
                 sources = JsonSerializer.Deserialize<List<ApiSource>>(json, JsonOpts) ?? [];
             }
 
-            int added = 0;
-            foreach (ApiSource source in sources)
+            var added = 0;
+            foreach (var source in sources)
             {
                 if (string.IsNullOrWhiteSpace(source.ApiBaseUrl)) continue;
                 source.IsAdult = source.Name.Contains("🔞") || source.IsAdult;
@@ -313,9 +459,9 @@ public partial class SettingsViewModel : BaseViewModel
                 return;
             }
 
-            string json = JsonSerializer.Serialize(sources, JsonOpts);
-            string fileName = $"apisources_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-            string filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
+            var json = JsonSerializer.Serialize(sources, JsonOpts);
+            var fileName = $"apisources_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
             await File.WriteAllTextAsync(filePath, json);
 
             await Share.Default.RequestAsync(new ShareFileRequest
@@ -354,10 +500,10 @@ public partial class SettingsViewModel : BaseViewModel
                 return;
             }
 
-            int completed = 0;
+            var completed = 0;
             var tasks = sources.Select(async s =>
             {
-                PingResult result = await PingSourceAsync(s);
+                var result = await PingSourceAsync(s);
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     PingResults.Add(result);
@@ -368,7 +514,7 @@ public partial class SettingsViewModel : BaseViewModel
 
             await Task.WhenAll(tasks);
 
-            int successCount = PingResults.Count(r => r.IsSuccess);
+            var successCount = PingResults.Count(r => r.IsSuccess);
             PingStatusText = $"测试完成: {successCount}/{sources.Count} 可用";
         }
         catch (Exception ex)
@@ -392,7 +538,7 @@ public partial class SettingsViewModel : BaseViewModel
         try
         {
             var sw = Stopwatch.StartNew();
-            HttpResponseMessage response = await _httpClient.GetAsync(source.ApiBaseUrl);
+            var response = await _httpClient.GetAsync(source.ApiBaseUrl);
             sw.Stop();
             result.IsSuccess = response.IsSuccessStatusCode;
             result.LatencyMs = sw.ElapsedMilliseconds;
@@ -420,7 +566,7 @@ public partial class SettingsViewModel : BaseViewModel
         try
         {
             if (item == null) return;
-            ApiSource? source = await _databaseService.GetApiSourceByIdAsync(item.Id);
+            var source = await _databaseService.GetApiSourceByIdAsync(item.Id);
 
             if (source != null)
             {
@@ -449,4 +595,12 @@ public partial class ApiSourceItem : ObservableObject
     public string? Source { get; set; }
     public string? Name { get; set; }
     public bool IsCustom { get; set; }
+}
+
+public partial class CacheItemInfo : ObservableObject
+{
+    [ObservableProperty] private string _fileName = string.Empty;
+    [ObservableProperty] private string _filePath = string.Empty;
+    [ObservableProperty] private long _size;
+    [ObservableProperty] private string _sizeText = string.Empty;
 }

@@ -20,6 +20,7 @@ public partial class SettingsPage : UraniumContentPage
     {
         base.OnNavigatedTo(args);
         _viewModel.LoadApiSourcesAsync().FireAndForget();
+        _viewModel.LoadCacheInfoAsync().FireAndForget();
     }
 
     private void Switch_OnToggled(object? sender, ToggledEventArgs e)

@@ -6,7 +6,7 @@
     x:DataType="vm:SettingsViewModel"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:materialSymbols="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-    xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
+    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
     xmlns:vm="clr-namespace:Lunadroid.App.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
@@ -89,78 +89,81 @@
                                          Dark={StaticResource Gray600}}"
                 StrokeShape="RoundRectangle 12">
                 <VerticalStackLayout Spacing="8">
-                    <Label
-                        FontAttributes="Bold"
-                        FontSize="18"
-                        Text="📋 资源列表"
-                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
-                                                    Dark={StaticResource White}}" />
-
-                    <CollectionView ItemsSource="{Binding ApiSourceItems}" MaximumHeightRequest="400">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ApiSourceItem">
-                                <Border
-                                    BackgroundColor="{AppThemeBinding Light={StaticResource Background},
-                                                                      Dark={StaticResource Gray900}}"
-                                    Margin="0,3"
-                                    Padding="10,8"
-                                    Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
-                                                             Dark={StaticResource Gray600}}"
-                                    StrokeShape="RoundRectangle 8">
-                                    <Grid
-                                        ColumnDefinitions="Auto,*,Auto,Auto"
-                                        ColumnSpacing="8"
-                                        RowDefinitions="Auto,Auto">
-                                        <Switch
-                                            Grid.Column="0"
-                                            Grid.Row="0"
-                                            Grid.RowSpan="2"
-                                            IsToggled="{Binding Enable}"
-                                            OnColor="{StaticResource Primary}"
-                                            Toggled="Switch_OnToggled"
-                                            VerticalOptions="Center" />
-                                        <Label
-                                            FontAttributes="Bold"
-                                            FontSize="14"
-                                            Grid.Column="1"
-                                            Grid.Row="0"
-                                            LineBreakMode="TailTruncation"
-                                            Text="{Binding Name}"
-                                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
-                                                                        Dark={StaticResource White}}" />
-                                        <Label
-                                            FontSize="11"
-                                            Grid.Column="1"
-                                            Grid.Row="1"
-                                            LineBreakMode="MiddleTruncation"
-                                            Text="{Binding Source}"
-                                            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
-                                                                        Dark={StaticResource Gray400}}" />
-                                        <Label
-                                            FontSize="14"
-                                            Grid.Column="2"
-                                            Grid.Row="0"
-                                            IsVisible="{Binding IsCustom}"
-                                            Text="自定义"
-                                            VerticalOptions="Center" />
-                                        <ImageButton
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=DeleteApiSourceCommand}"
-                                            CommandParameter="{Binding}"
-                                            Grid.Column="3"
-                                            Grid.Row="0"
-                                            Grid.RowSpan="2"
-                                            HeightRequest="36"
-                                            Source="{FontImageSource FontFamily=MaterialOutlined,
-                                                                     Size=20,
-                                                                     Color={AppThemeBinding Light={StaticResource Error},
-                                                                                            Dark={StaticResource ErrorDark}},
-                                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Delete}}"
-                                            WidthRequest="36" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                    <uranium:ExpanderView IsExpanded="False">
+                        <uranium:ExpanderView.Header>
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                Text="📋 资源列表"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                            Dark={StaticResource White}}" />
+                        </uranium:ExpanderView.Header>
+                        <CollectionView ItemsSource="{Binding ApiSourceItems}" MaximumHeightRequest="400">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ApiSourceItem">
+                                    <Border
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource Background},
+                                                                          Dark={StaticResource Gray900}}"
+                                        Margin="0,3"
+                                        Padding="10,8"
+                                        Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                                                 Dark={StaticResource Gray600}}"
+                                        StrokeShape="RoundRectangle 8">
+                                        <Grid
+                                            ColumnDefinitions="Auto,*,Auto,Auto"
+                                            ColumnSpacing="8"
+                                            RowDefinitions="Auto,Auto">
+                                            <Switch
+                                                Grid.Column="0"
+                                                Grid.Row="0"
+                                                Grid.RowSpan="2"
+                                                IsToggled="{Binding Enable}"
+                                                OnColor="{StaticResource Primary}"
+                                                Toggled="Switch_OnToggled"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="14"
+                                                Grid.Column="1"
+                                                Grid.Row="0"
+                                                LineBreakMode="TailTruncation"
+                                                Text="{Binding Name}"
+                                                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                            Dark={StaticResource White}}" />
+                                            <Label
+                                                FontSize="11"
+                                                Grid.Column="1"
+                                                Grid.Row="1"
+                                                LineBreakMode="MiddleTruncation"
+                                                Text="{Binding Source}"
+                                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                            Dark={StaticResource Gray400}}" />
+                                            <Label
+                                                FontSize="14"
+                                                Grid.Column="2"
+                                                Grid.Row="0"
+                                                IsVisible="{Binding IsCustom}"
+                                                Text="自定义"
+                                                VerticalOptions="Center" />
+                                            <ImageButton
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=DeleteApiSourceCommand}"
+                                                CommandParameter="{Binding}"
+                                                Grid.Column="3"
+                                                Grid.Row="0"
+                                                Grid.RowSpan="2"
+                                                HeightRequest="36"
+                                                Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                         Size=20,
+                                                                         Color={AppThemeBinding Light={StaticResource Error},
+                                                                                                Dark={StaticResource ErrorDark}},
+                                                                         Glyph={x:Static materialSymbols:MaterialOutlined.Delete}}"
+                                                WidthRequest="36" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </uranium:ExpanderView>
                 </VerticalStackLayout>
             </Border>
 
@@ -233,6 +236,119 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!--  缓存管理  -->
+            <Border
+                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                  Dark={StaticResource Gray900}}"
+                Padding="16,12"
+                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                         Dark={StaticResource Gray600}}"
+                StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            Grid.Column="0"
+                            Text="🗑️ 缓存管理"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}" />
+                        <Button
+                            Command="{Binding LoadCacheInfoCommand}"
+                            FontSize="12"
+                            Grid.Column="1"
+                            HeightRequest="32"
+                            IsEnabled="{Binding IsCalculatingCache, Converter={StaticResource InvertedBoolConverter}}"
+                            Padding="10,4"
+                            Text="刷新" />
+                        <Button
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Error},
+                                                              Dark={StaticResource ErrorDark}}"
+                            Command="{Binding ClearAllCacheCommand}"
+                            FontSize="12"
+                            Grid.Column="2"
+                            HeightRequest="32"
+                            IsEnabled="{Binding IsClearingCache, Converter={StaticResource InvertedBoolConverter}}"
+                            Padding="10,4"
+                            Text="清除全部" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                        <Label
+                            FontSize="14"
+                            Grid.Column="0"
+                            Text="缓存占用:"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                        Dark={StaticResource Gray400}}" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            Grid.Column="1"
+                            Text="{Binding CacheSizeText}"
+                            TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                        Dark={StaticResource White}}" />
+                    </Grid>
+
+                    <ActivityIndicator
+                        Color="{StaticResource Primary}"
+                        HorizontalOptions="Center"
+                        IsRunning="{Binding IsCalculatingCache}"
+                        IsVisible="{Binding IsCalculatingCache}" />
+
+                    <uranium:ExpanderView IsExpanded="False">
+                        <uranium:ExpanderView.Header>
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                Text="占用最大的缓存"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                            Dark={StaticResource Gray400}}" />
+                        </uranium:ExpanderView.Header>
+                        <CollectionView ItemsSource="{Binding CacheItems}" MaximumHeightRequest="300">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:CacheItemInfo">
+                                    <Border
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource Background},
+                                                                          Dark={StaticResource Gray900}}"
+                                        Margin="0,2"
+                                        Padding="10,6"
+                                        Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                                                 Dark={StaticResource Gray600}}"
+                                        StrokeShape="RoundRectangle 6">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <VerticalStackLayout Grid.Column="0">
+                                                <Label
+                                                    FontSize="13"
+                                                    LineBreakMode="MiddleTruncation"
+                                                    Text="{Binding FileName}"
+                                                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                                Dark={StaticResource White}}" />
+                                                <Label
+                                                    FontSize="11"
+                                                    Text="{Binding SizeText}"
+                                                    TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                                Dark={StaticResource Gray400}}" />
+                                            </VerticalStackLayout>
+                                            <ImageButton
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=DeleteCacheItemCommand}"
+                                                CommandParameter="{Binding}"
+                                                Grid.Column="1"
+                                                HeightRequest="32"
+                                                Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                                         Size=18,
+                                                                         Color={AppThemeBinding Light={StaticResource Error},
+                                                                                                Dark={StaticResource ErrorDark}},
+                                                                         Glyph={x:Static materialSymbols:MaterialOutlined.Delete}}"
+                                                WidthRequest="32" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </uranium:ExpanderView>
                 </VerticalStackLayout>
             </Border>
 
