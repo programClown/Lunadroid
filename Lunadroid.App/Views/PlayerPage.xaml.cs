@@ -14,12 +14,12 @@ public partial class PlayerPage : ContentPage, IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.TryGetValue("Online", out object? movieObj) && movieObj is VedioSearchResult movie)
+        if (query.TryGetValue("Online", out var movieObj) && movieObj is VedioSearchResult movie)
         {
             var vm = (PlayerViewModel)BindingContext;
             vm.SetOnLineVideoAsync(movie).FireAndForget();
         }
-        else if (query.TryGetValue("Local", out object? localObj) && localObj is string playUrl)
+        else if (query.TryGetValue("Local", out var localObj) && localObj is FileResult playUrl)
         {
             var vm = (PlayerViewModel)BindingContext;
             vm.SetLocalVideoAsync(playUrl).FireAndForget();

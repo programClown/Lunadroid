@@ -20,6 +20,7 @@ public partial class PlayerViewModel : BaseViewModel
     [ObservableProperty] private List<string> _playSurfaces = ["maui播放器", "web播放器"];
     [ObservableProperty] private string _selectedPlaySurface = "web播放器";
     [ObservableProperty] private DetailResult? _videoDetail;
+    private VedioSearchResult _videoSearchResult;
     private string _videoUrl = "";
     [ObservableProperty] private string _webVideoUrl = "";
 
@@ -33,13 +34,16 @@ public partial class PlayerViewModel : BaseViewModel
     public async Task SetOnLineVideoAsync(VedioSearchResult? videoSearchResult)
     {
         if (videoSearchResult == null) return;
+        _videoSearchResult = videoSearchResult;
         await LoadDetailAsync(videoSearchResult.Source, videoSearchResult.Id);
+        SelectedPlaySurface = "web播放器";
     }
 
-    public async Task SetLocalVideoAsync(string? playUrl)
+    public async Task SetLocalVideoAsync(FileResult? fileResult)
     {
-        if (playUrl == null) return;
-        await LoadDetailAsync(playUrl, null);
+        if (fileResult == null) return;
+        await LoadDetailAsync(fileResult.FullPath, null);
+        SelectedPlaySurface = "maui播放器";
     }
 
     public async Task LoadDetailAsync(string source, string? vodId)
@@ -51,19 +55,62 @@ public partial class PlayerViewModel : BaseViewModel
         {
             if (vodId is null)
             {
-                // 本地视频
-                return;
+                if (File.Exists(source))
+                {
+                    // 本地视频
+                    var detail = new DetailResult
+                    {
+                        SourceName = "本地视频",
+                        Source = "local undefined",
+                        Title = Path.GetFileNameWithoutExtension(source),
+                        Area = "本地",
+                        Year = "9527",
+                        Type = "本地",
+                        Director = "未知",
+                        Actor = "未知",
+                        Desc = "",
+                        VodId = "local undefined",
+                        DetailUrl = "local undefined",
+                        Episodes =
+                        [
+                            new EpisodeSubject
+                            {
+                                Name = "第1集",
+                                Url = source
+                            }
+                        ]
+                    };
+                    VideoDetail = detail;
+                }
+                else
+                {
+                    IsBusy = false;
+                    return;
+                }
             }
-
-            VideoDetail = await _movieTvService.SearchDetail(source, vodId);
-            if (VideoDetail == null) return;
+            else
+            {
+                // 在线视频
+                var detail = await _movieTvService.SearchDetail(source, vodId);
+                if (detail == null) return;
+                detail.SourceName ??= _videoSearchResult.SourceName;
+                detail.Title ??= _videoSearchResult.Name;
+                detail.Area ??= "太阳系";
+                detail.Year ??= _videoSearchResult.Year.ToString();
+                detail.Type ??= _videoSearchResult.Tag;
+                detail.Director ??= "未知";
+                detail.Actor ??= "未知";
+                //detail.Desc只要<p>标签的内容
+                detail.Desc = detail.Desc?.Split("<p>")[1]?.Split("</p>")[0] ?? "";
+                VideoDetail = detail;
+            }
 
             Episodes.Clear();
             if (VideoDetail.Episodes != null)
             {
                 Episodes = VideoDetail.Episodes.Select(ep => new EpisodeSubjectItem
                 {
-                    Watched = false,
+                    Watched = vodId is null,
                     Name = ep.Name,
                     Url = ep.Url,
                     IsSelected = true // 默认全部选中
@@ -111,7 +158,7 @@ public partial class PlayerViewModel : BaseViewModel
             Url = episode.Url,
             Episode = episode.Name,
             TotalEpisodeCount = VideoDetail.Episodes.Count,
-            IsLocal = false
+            IsLocal = VideoDetail.SourceName == "本地视频"
         };
         Episodes[Episodes.IndexOf(Episodes.FirstOrDefault(ep => ep.Name == episode.Name))].Watched =
             true;

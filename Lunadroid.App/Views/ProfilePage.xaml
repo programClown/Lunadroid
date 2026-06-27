@@ -131,6 +131,147 @@
                 </VerticalStackLayout>
             </Border>
 
+            <Border
+                BackgroundColor="{AppThemeBinding Light={StaticResource Surface},
+                                                  Dark={StaticResource Gray900}}"
+                Padding="16,12"
+                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant},
+                                         Dark={StaticResource Gray600}}"
+                StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="12">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Text="🌐 社区"
+                        TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                    Dark={StaticResource White}}" />
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border
+                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainer},
+                                                              Dark={StaticResource Gray900}}"
+                            Grid.Column="0"
+                            HeightRequest="40"
+                            Padding="1"
+                            StrokeShape="RoundRectangle 8"
+                            WidthRequest="40">
+                            <Label
+                                FontSize="20"
+                                HorizontalOptions="Center"
+                                Text="📱"
+                                VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label
+                                FontSize="14"
+                                Text="Lunadroid"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                            Dark={StaticResource White}}" />
+                            <Label
+                                FontSize="12"
+                                Text="Android 开源地址"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                            Dark={StaticResource Gray400}}" />
+                        </VerticalStackLayout>
+                        <Image
+                            Grid.Column="2"
+                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                     Size=24,
+                                                     Color={AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                            Dark={StaticResource Gray400}},
+                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Open_in_new}}"
+                            VerticalOptions="Center" />
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnLunadroidGitHubTapped" />
+                        </Grid.GestureRecognizers>
+                    </Grid>
+
+                    <Line BackgroundColor="{AppThemeBinding Light={StaticResource OutlineVariant}, Dark={StaticResource Gray900}}" HeightRequest="1" />
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border
+                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainer},
+                                                              Dark={StaticResource Gray900}}"
+                            Grid.Column="0"
+                            HeightRequest="40"
+                            Padding="1"
+                            StrokeShape="RoundRectangle 8"
+                            WidthRequest="40">
+                            <Label
+                                FontSize="20"
+                                HorizontalOptions="Center"
+                                Text="🖥️"
+                                VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label
+                                FontSize="14"
+                                Text="LunaTV"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                            Dark={StaticResource White}}" />
+                            <Label
+                                FontSize="12"
+                                Text="PC 开源地址"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                            Dark={StaticResource Gray400}}" />
+                        </VerticalStackLayout>
+                        <Image
+                            Grid.Column="2"
+                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                     Size=24,
+                                                     Color={AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                            Dark={StaticResource Gray400}},
+                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Open_in_new}}"
+                            VerticalOptions="Center" />
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnLunaTVGitHubTapped" />
+                        </Grid.GestureRecognizers>
+                    </Grid>
+
+                    <Line BackgroundColor="{AppThemeBinding Light={StaticResource OutlineVariant}, Dark={StaticResource Gray900}}" HeightRequest="1" />
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border
+                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainer},
+                                                              Dark={StaticResource Gray900}}"
+                            Grid.Column="0"
+                            HeightRequest="40"
+                            Padding="1"
+                            StrokeShape="RoundRectangle 8"
+                            WidthRequest="40">
+                            <Image
+                                Aspect="AspectFill"
+                                HorizontalOptions="Center"
+                                Source="kys_group.jpg"
+                                VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label
+                                FontSize="14"
+                                Text="QQ 讨论群"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                            Dark={StaticResource White}}" />
+                            <Label
+                                FontSize="12"
+                                Text="扫码加入 QQ 群"
+                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                            Dark={StaticResource Gray400}}" />
+                        </VerticalStackLayout>
+                        <Image
+                            Grid.Column="2"
+                            Source="{FontImageSource FontFamily=MaterialOutlined,
+                                                     Size=24,
+                                                     Color={AppThemeBinding Light={StaticResource OnSurfaceVariant},
+                                                                            Dark={StaticResource Gray400}},
+                                                     Glyph={x:Static materialSymbols:MaterialOutlined.Chevron_right}}"
+                            VerticalOptions="Center" />
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnQQGroupTapped" />
+                        </Grid.GestureRecognizers>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
         </VerticalStackLayout>
     </ScrollView>
 </uranium:UraniumContentPage>

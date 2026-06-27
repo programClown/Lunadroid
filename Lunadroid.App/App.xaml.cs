@@ -86,6 +86,13 @@ public partial class App : Application
             var appConfigService = Services.GetRequiredService<AppConfigService>();
             var config = appConfigService.Config;
 
+            Current!.UserAppTheme = config.ThemeMode switch
+            {
+                "Light" => AppTheme.Light,
+                "Dark" => AppTheme.Dark,
+                _ => AppTheme.Unspecified
+            };
+
             Page startPage;
 
             if (!config.OnboardingCompleted)

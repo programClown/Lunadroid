@@ -29,6 +29,18 @@ public partial class HomeViewModel : BaseViewModel
     {
         _databaseService = databaseService;
         _movieTvService = movieTvService;
+        MainThread.BeginInvokeOnMainThread(async void () =>
+        {
+            try
+            {
+                var apiSources = await _databaseService.GetEnabledApiSourcesAsync();
+                AppSettings.UpdateSites(apiSources);
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"Failed to load api sources: {e.Message}");
+            }
+        });
     }
 
     public ObservableCollection<VedioSearchResult> SearchResults { get; } = [];
@@ -115,8 +127,11 @@ public partial class HomeViewModel : BaseViewModel
 
             if (result != null)
             {
-                await Shell.Current.GoToAsync(
-                    $"player?playUrl={Uri.EscapeDataString(result.FullPath)}&title={Uri.EscapeDataString(result.FileName)}&isLocal=true");
+                var navigationParameters = new Dictionary<string, object>
+                {
+                    { "Local", result }
+                };
+                await Shell.Current.GoToAsync(nameof(PlayerPage), navigationParameters);
             }
         }
         catch (Exception)

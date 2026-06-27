@@ -10,9 +10,4 @@ public partial class HomePage : UraniumContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
-
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-    }
 }
