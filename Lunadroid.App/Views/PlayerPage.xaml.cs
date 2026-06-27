@@ -1,5 +1,6 @@
 using Lunadroid.App.Models;
 using Lunadroid.App.ViewModels;
+using Lunadroid.Core.Models;
 using UraniumUI.Extensions;
 
 namespace Lunadroid.App.Views;
@@ -23,6 +24,11 @@ public partial class PlayerPage : ContentPage, IQueryAttributable
         {
             var vm = (PlayerViewModel)BindingContext;
             vm.SetLocalVideoAsync(playUrl).FireAndForget();
+        }
+        else if (query.TryGetValue("History", out var historyObj) && historyObj is PlayHistory history)
+        {
+            var vm = (PlayerViewModel)BindingContext;
+            vm.SetFromHistoryAsync(history).FireAndForget();
         }
     }
 }

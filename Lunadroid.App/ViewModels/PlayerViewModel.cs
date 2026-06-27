@@ -46,6 +46,26 @@ public partial class PlayerViewModel : BaseViewModel
         SelectedPlaySurface = "maui播放器";
     }
 
+    public async Task SetFromHistoryAsync(PlayHistory history)
+    {
+        if (history.IsLocal)
+        {
+            await LoadDetailAsync(history.Url!, null);
+            SelectedPlaySurface = "maui播放器";
+        }
+        else
+        {
+            await LoadDetailAsync(history.Source!, history.VodId);
+            SelectedPlaySurface = "web播放器";
+        }
+
+        var targetEpisode = Episodes.FirstOrDefault(ep => ep.Name == history.Episode);
+        if (targetEpisode != null)
+        {
+            await SelectEpisodeCommand.ExecuteAsync(targetEpisode);
+        }
+    }
+
     public async Task LoadDetailAsync(string source, string? vodId)
     {
         if (IsBusy) return;

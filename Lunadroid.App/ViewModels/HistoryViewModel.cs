@@ -1,8 +1,9 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lunadroid.App.Views;
 using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
-using System.Collections.ObjectModel;
 
 namespace Lunadroid.App.ViewModels;
 
@@ -54,7 +55,7 @@ public partial class HistoryViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task DeleteHistoryAsync(PlayHistory history)
+    private async Task DeleteHistoryAsync(PlayHistory? history)
     {
         if (history == null) return;
         await _databaseService.DeletePlayHistoryAsync(history);
@@ -72,6 +73,7 @@ public partial class HistoryViewModel : BaseViewModel
         {
             await _databaseService.DeletePlayHistoryAsync(item);
         }
+
         OnlineHistories.Clear();
         HasOnlineHistories = false;
     }
@@ -84,7 +86,40 @@ public partial class HistoryViewModel : BaseViewModel
         {
             await _databaseService.DeletePlayHistoryAsync(item);
         }
+
         LocalHistories.Clear();
         HasLocalHistories = false;
+    }
+
+    [RelayCommand]
+    private async Task HistoryTappedAsync(PlayHistory? history)
+    {
+        if (history == null) return;
+
+        if (history.IsLocal)
+        {
+            if (string.IsNullOrEmpty(history.Url) || !File.Exists(history.Url))
+            {
+                await Shell.Current?.DisplayAlert("提示", "缓存已清理，该文件不存在", "确定");
+                await _databaseService.DeletePlayHistoryAsync(history);
+                LocalHistories.Remove(history);
+                HasLocalHistories = LocalHistories.Count > 0;
+                return;
+            }
+
+            var navigationParameters = new Dictionary<string, object>
+            {
+                { "History", history }
+            };
+            await Shell.Current.GoToAsync(nameof(PlayerPage), navigationParameters);
+        }
+        else
+        {
+            var navigationParameters = new Dictionary<string, object>
+            {
+                { "History", history }
+            };
+            await Shell.Current.GoToAsync(nameof(PlayerPage), navigationParameters);
+        }
     }
 }
