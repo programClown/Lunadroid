@@ -101,6 +101,19 @@ public partial class PlayerViewModel : BaseViewModel
                         ]
                     };
                     VideoDetail = detail;
+
+                    var history = new PlayHistory
+                    {
+                        VodId = detail.VodId,
+                        Name = detail.Title,
+                        Source = detail.Source,
+                        SourceName = detail.SourceName,
+                        Url = source,
+                        Episode = "第1集",
+                        TotalEpisodeCount = 1,
+                        IsLocal = true
+                    };
+                    await _databaseService.AddOrUpdatePlayHistoryAsync(history);
                 }
                 else
                 {
@@ -121,7 +134,7 @@ public partial class PlayerViewModel : BaseViewModel
                 detail.Director ??= "未知";
                 detail.Actor ??= "未知";
                 //detail.Desc只要<p>标签的内容
-                detail.Desc = detail.Desc?.Split("<p>")[1]?.Split("</p>")[0] ?? "";
+                detail.Desc = detail.Desc?.Replace("<p>", "")?.Replace("</p>", "") ?? "";
                 VideoDetail = detail;
             }
 
