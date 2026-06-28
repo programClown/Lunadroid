@@ -69,6 +69,8 @@ public partial class HomeViewModel : BaseViewModel
         {
             foreach (var api in AppSettings.SelectApis)
             {
+                if (token.IsCancellationRequested) break;
+
                 var ones = await _movieTvService.Search(api, keyword);
                 // ones.ForEach(x => SearchResults.Add(x));
                 foreach (var vedioSearchResult in ones)
@@ -76,6 +78,7 @@ public partial class HomeViewModel : BaseViewModel
                     SearchResults.Add(vedioSearchResult);
                 }
 
+                HasSearchResults = SearchResults.Count > 0;
                 if (SearchResults.Count >= AppSettings.SearchMaxVideos) break;
             }
 
@@ -90,7 +93,6 @@ public partial class HomeViewModel : BaseViewModel
             SearchStatusText = SearchResults.Count > 0
                 ? $"搜索完成，共找到 {SearchResults.Count} 个结果"
                 : "未找到相关影视资源";
-            HasSearchResults = true;
         }
         catch (OperationCanceledException)
         {

@@ -5,7 +5,7 @@ public class AppConfig
     public bool OnboardingCompleted { get; set; }
     public bool TermsAccepted { get; set; }
     public string ThemeMode { get; set; } = "Dark";
-    public bool SecurityLockEnabled { get; set; }
+    public bool SecurityLockEnabled { get; set; } = true;
     public string? PinCode { get; set; }
     public string CloudSourceUrl { get; set; } = "https://pz.v88.qzz.io/?format=0&source=full";
     public string DownloadDirectory { get; set; } = string.Empty;

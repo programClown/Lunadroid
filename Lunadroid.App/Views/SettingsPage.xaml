@@ -91,12 +91,36 @@
                 <VerticalStackLayout Spacing="8">
                     <uranium:ExpanderView IsExpanded="False">
                         <uranium:ExpanderView.Header>
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="18"
-                                Text="📋 资源列表"
-                                TextColor="{AppThemeBinding Light={StaticResource OnSurface},
-                                                            Dark={StaticResource White}}" />
+                            <Grid
+                                ColumnDefinitions="*,Auto,Auto"
+                                ColumnSpacing="8"
+                                VerticalOptions="Center">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="18"
+                                    Grid.Column="0"
+                                    Text="📋 资源列表"
+                                    TextColor="{AppThemeBinding Light={StaticResource OnSurface},
+                                                                Dark={StaticResource White}}" />
+                                <Button
+                                    Command="{Binding SelectAllApiSourcesCommand}"
+                                    FontSize="12"
+                                    Grid.Column="1"
+                                    HeightRequest="32"
+                                    Padding="8,2"
+                                    Text="全选"
+                                    VerticalOptions="Center" />
+                                <Button
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Secondary},
+                                                                      Dark={StaticResource SecondaryDark}}"
+                                    Command="{Binding DeselectAllApiSourcesCommand}"
+                                    FontSize="12"
+                                    Grid.Column="2"
+                                    HeightRequest="32"
+                                    Padding="8,2"
+                                    Text="全不选"
+                                    VerticalOptions="Center" />
+                            </Grid>
                         </uranium:ExpanderView.Header>
                         <CollectionView ItemsSource="{Binding ApiSourceItems}" MaximumHeightRequest="400">
                             <CollectionView.ItemTemplate>

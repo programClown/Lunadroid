@@ -581,6 +581,40 @@ public partial class SettingsViewModel : BaseViewModel
         }
     }
 
+    [RelayCommand]
+    private async Task SelectAllApiSourcesAsync()
+    {
+        foreach (var item in ApiSourceItems)
+        {
+            item.Enable = true;
+            var source = await _databaseService.GetApiSourceByIdAsync(item.Id);
+            if (source != null)
+            {
+                source.IsEnabled = true;
+                await _databaseService.UpdateApiSourceAsync(source);
+            }
+        }
+
+        await RefreshAppSettingsAsync();
+    }
+
+    [RelayCommand]
+    private async Task DeselectAllApiSourcesAsync()
+    {
+        foreach (var item in ApiSourceItems)
+        {
+            item.Enable = false;
+            var source = await _databaseService.GetApiSourceByIdAsync(item.Id);
+            if (source != null)
+            {
+                source.IsEnabled = false;
+                await _databaseService.UpdateApiSourceAsync(source);
+            }
+        }
+
+        await RefreshAppSettingsAsync();
+    }
+
     private async Task RefreshAppSettingsAsync()
     {
         var apiSources = await _databaseService.GetEnabledApiSourcesAsync();
