@@ -1,11 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Java.Lang;
 using Lunadroid.Core.Models;
 using Lunadroid.Core.Services;
 using Environment = Android.OS.Environment;
-using Exception = System.Exception;
 
 namespace Lunadroid.App.ViewModels;
 
@@ -29,17 +27,6 @@ public partial class DownloadViewModel : BaseViewModel
 
     public ObservableCollection<MediaDownload> DownloadingItems { get; } = [];
     public ObservableCollection<MediaDownload> DownloadedItems { get; } = [];
-
-    private string EnsureFfmpegExecutable()
-    {
-        var ffmpegSourcePath = "/data/local/tmp/ffmpeg";
-
-        // chmod 755 赋予执行权限
-        using var chmodProcess = Runtime.GetRuntime()!.Exec($"chmod 755 {ffmpegSourcePath}");
-        chmodProcess.WaitFor();
-
-        return ffmpegSourcePath;
-    }
 
     public async Task LoadDownloadsAsync()
     {
@@ -70,6 +57,15 @@ public partial class DownloadViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+
+        // Task.Run(async () =>
+        // {
+        //     var publicDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDocuments);
+        //     var saveDir = Path.Combine(publicDir!.AbsolutePath, "Lunadroid");
+        //     var downloadManager = new DownloadManager();
+        //     downloadManager.ExternalPath = saveDir;
+        //     await downloadManager.DownloadAsync("https://vod.360zyx.vip/20250708/7T2xjBRd/index.m3u8", saveDir, "曼达洛人");
+        // }).ConfigureAwait(false);
     }
 
     [RelayCommand]

@@ -65,6 +65,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Lunadroid.Core\Lunadroid.Core.csproj"/>
+        <ProjectReference Include="..\M3U8Download\M3U8Download.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

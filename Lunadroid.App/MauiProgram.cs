@@ -49,7 +49,7 @@ public static class MauiProgram
         builder.Services.AddTransient<AppLockViewModel>();
         builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<HistoryViewModel>();
-        // builder.Services.AddTransient<DownloadViewModel>();
+        builder.Services.AddTransient<DownloadViewModel>();
         builder.Services.AddTransient<PlayerViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<ProfileViewModel>();

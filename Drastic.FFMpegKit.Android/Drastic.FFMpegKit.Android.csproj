@@ -8,13 +8,10 @@
           Enable trim analyzers for Android class libraries.
           To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/prepare-libraries-for-trimming
         -->
-        <IsTrimmable>true</IsTrimmable>
+        <!--        <IsTrimmable>true</IsTrimmable>-->
         <!--
           NOTE: you can simply add .aar or .jar files in this directory to be included in the project.
           To learn more, see: https://learn.microsoft.com/dotnet/maui/migration/android-binding-projects
         -->
     </PropertyGroup>
-    <ItemGroup>
-      <Folder Include="Jars\" />
-    </ItemGroup>
 </Project>

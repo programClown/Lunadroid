@@ -144,14 +144,14 @@ public class DownloadManager
         }
 
         // 预先检查ffmpeg
-        Option.FFmpegBinaryPath ??= GlobalUtil.FindExecutable("ffmpeg");
-        
-        if (string.IsNullOrEmpty(Option.FFmpegBinaryPath) || !File.Exists(Option.FFmpegBinaryPath))
-        {
-            throw new FileNotFoundException(ResString.ffmpegNotFound);
-        }
-        
-        Logger.Extra($"ffmpeg => {Option.FFmpegBinaryPath}");
+        // Option.FFmpegBinaryPath ??= GlobalUtil.FindExecutable("ffmpeg");
+        //
+        // if (string.IsNullOrEmpty(Option.FFmpegBinaryPath) || !File.Exists(Option.FFmpegBinaryPath))
+        // {
+        //     throw new FileNotFoundException(ResString.ffmpegNotFound);
+        // }
+        //
+        // Logger.Extra($"ffmpeg => {Option.FFmpegBinaryPath}");
 
         // 预先检查mkvmerge
         if (Option is { MuxOptions.UseMkvmerge: true, MuxAfterDone: true })

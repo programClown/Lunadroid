@@ -1,6 +1,6 @@
-﻿using N_m3u8DL_RE.Entity;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using FFMpegKit.Droid;
+using N_m3u8DL_RE.Entity;
 
 namespace N_m3u8DL_RE.Util;
 
@@ -42,7 +42,11 @@ internal static partial class MediainfoUtil
 
         if (string.IsNullOrEmpty(file) || !File.Exists(file)) return result;
 
-        string cmd = "-hide_banner -i \"" + file + "\"";
+        var cmd = "-hide_banner -i \"" + file + "\"";
+#if ANDROID
+        var session = FFmpegKit.Execute(cmd);
+        var output = session?.Output;
+#else
         Process p = Process.Start(new ProcessStartInfo
         {
             FileName = binary,
@@ -54,6 +58,7 @@ internal static partial class MediainfoUtil
         })!;
         string output = await p.StandardError.ReadToEndAsync();
         await p.WaitForExitAsync();
+#endif
 
         foreach (Match stream in TextRegex().Matches(output))
         {
@@ -71,7 +76,8 @@ internal static partial class MediainfoUtil
             info.BaseInfo = ReplaceRegex().Replace(info.BaseInfo, "");
             info.HDR = info.Text.Contains("/bt2020/");
 
-            if (info.BaseInfo.Contains("dvhe") || info.BaseInfo.Contains("dvh1") || info.BaseInfo.Contains("DOVI") || info.Type.Contains("dvvideo") || DoViRegex().IsMatch(output) && info.Type == "Video"
+            if (info.BaseInfo.Contains("dvhe") || info.BaseInfo.Contains("dvh1") || info.BaseInfo.Contains("DOVI") ||
+                info.Type.Contains("dvvideo") || (DoViRegex().IsMatch(output) && info.Type == "Video")
                )
             {
                 info.DolbyVison = true;
@@ -79,8 +85,8 @@ internal static partial class MediainfoUtil
 
             if (StartRegex().IsMatch(output))
             {
-                string f = StartRegex().Match(output).Groups[1].Value;
-                if (double.TryParse(f, out double d))
+                var f = StartRegex().Match(output).Groups[1].Value;
+                if (double.TryParse(f, out var d))
                 {
                     info.StartTime = TimeSpan.FromSeconds(d);
                 }

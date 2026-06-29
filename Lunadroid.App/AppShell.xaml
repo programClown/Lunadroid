@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
 <Shell
     Shell.FlyoutBehavior="Disabled"
     Shell.TabBarBackgroundColor="{AppThemeBinding Light={StaticResource Surface},
@@ -11,17 +12,12 @@
                                                   Dark={StaticResource OnSurfaceVariantDark}}"
     x:Class="Lunadroid.App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:local="clr-namespace:Lunadroid.App"
     xmlns:material="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
     xmlns:views="clr-namespace:Lunadroid.App.Views"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <Shell.Resources>
-        <ResourceDictionary>
-            <Style TargetType="Tab" x:Key="BaseTabStyle">
-                <Setter Property="Shell.TabBarIsVisible" Value="True" />
-            </Style>
-        </ResourceDictionary>
+        <ResourceDictionary />
     </Shell.Resources>
 
     <Tab Route="Home" Title="首页">
@@ -36,17 +32,17 @@
         <ShellContent ContentTemplate="{DataTemplate views:HomePage}" Route="HomePage" />
     </Tab>
 
-    <!-- <Tab Route="Download" Title="下载"> -->
-    <!--     <Tab.Icon> -->
-    <!--  <FontImageSource  -->
-    <!--  Color="{AppThemeBinding Light={StaticResource Primary},  -->
-    <!--  Dark={StaticResource PrimaryDark}}"  -->
-    <!--  FontFamily="MaterialOutlined"  -->
-    <!--  Glyph="{x:Static material:MaterialOutlined.Download}"  -->
-    <!--  Size="24" />  -->
-    <!--     </Tab.Icon> -->
-    <!--     <ShellContent ContentTemplate="{DataTemplate views:DownloadPage}" Route="DownloadPage" /> -->
-    <!-- </Tab> -->
+    <Tab Route="Download" Title="下载">
+        <Tab.Icon>
+            <FontImageSource
+                Color="{AppThemeBinding Light={StaticResource Primary},
+                                        Dark={StaticResource PrimaryDark}}"
+                FontFamily="MaterialOutlined"
+                Glyph="{x:Static material:MaterialOutlined.Download}"
+                Size="24" />
+        </Tab.Icon>
+        <ShellContent ContentTemplate="{DataTemplate views:DownloadPage}" Route="DownloadPage" />
+    </Tab>
 
     <Tab Route="History" Title="历史">
         <Tab.Icon>
