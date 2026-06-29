@@ -46,8 +46,14 @@ internal static class MergeUtil
     private static int InvokeFFmpeg(string binary, string command, string workingDirectory)
     {
         Logger.DebugMarkUp($"{binary}: {command}");
-
+#if ANDROID
+        // ReSharper disable CannotResolveSymbol
+        FFMpegKit.Droid.FFmpegSession session = FFMpegKit.Droid.FFmpegKit.Execute(command);
+        // ReSharper restore CannotResolveSymbol
+        return session.getReturnCode();
+#else
         using var p = new Process();
+        
         p.StartInfo = new ProcessStartInfo
         {
             WorkingDirectory = workingDirectory,
@@ -69,6 +75,9 @@ internal static class MergeUtil
         p.BeginErrorReadLine();
         p.WaitForExit();
         return p.ExitCode;
+#endif
+        
+        
     }
 
     public static string[] PartialCombineMultipleFiles(string[] files)

@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/M3U8Download/">
+    <Project Path="Drastic.FFMpegKit.Android/Drastic.FFMpegKit.Android.csproj" />
     <Project Path="M3U8Download/M3U8Download.csproj" />
     <Project Path="N_m3u8DL-RE/src/N_m3u8DL-RE.Common/N_m3u8DL-RE.Common.csproj" />
     <Project Path="N_m3u8DL-RE/src/N_m3u8DL-RE.Parser/N_m3u8DL-RE.Parser.csproj" />
